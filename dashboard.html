@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIGULA - My Dashboard</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial,sans-serif; }
+body { background:#121212; color:#fff; }
+header { background:#1f1f1f; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
+header h1 { color:#ff4d4f; font-size:1.8rem; }
+header button { background:#ff4d4f; color:#fff; border:none; padding:8px 16px; border-radius:25px; font-weight:bold; cursor:pointer; }
+
+.container { display:flex; max-width:1000px; margin:20px auto; gap:20px; min-height: 70vh; }
+.sidebar { width:220px; background:#1f1f1f; padding:20px; border-radius:15px; display:flex; flex-direction:column; justify-content:space-between; }
+.sidebar .menu { display:flex; flex-direction:column; }
+.sidebar button { width:100%; padding:10px 0; margin-bottom:10px; border:none; border-radius:10px; background:#ff4d4f; color:#fff; font-weight:bold; cursor:pointer; transition:0.2s; }
+.sidebar button:hover { background:#ff6666; }
+
+.main-content { flex:1; background:#1a1a1a; padding:20px; border-radius:15px; overflow-y:auto; max-height: 70vh; }
+.main-content h2 { color:#ff4d4f; margin-bottom:15px; }
+.item-list { display:flex; flex-direction:column; gap:10px; }
+.item-list div { background:#121212; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; }
+.item-list div span { font-size:0.9rem; }
+.item-list div button { background:#00bfff; color:#fff; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; }
+
+.footer-nav { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
+.footer-nav button { width:100%; padding:10px 0; border:none; border-radius:10px; background:#555; color:#fff; font-weight:bold; cursor:pointer; transition:0.2s; }
+.footer-nav button:hover { background:#777; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>BIGULA Dashboard</h1>
+  <button onclick="alert('Sign out coming soon')">Sign Out</button>
+</header>
+
+<div class="container">
+  <div class="sidebar">
+    <div class="menu">
+      <button onclick="showMyVideos()">My Videos</button>
+      <button onclick="showMonetize()">Monetize</button>
+      <button onclick="uploadVideo()">Upload +</button>
+      <button onclick="showFollowing()">Following</button>
+      <button onclick="showFollowers()">Followers</button>
+    </div>
+    <div class="footer-nav">
+      <button onclick="location.href='my-dashboard.html'">My Account</button>
+      <button onclick="location.href='home.html'">Home</button>
+      <button onclick="location.href='inbox.html'">Inbox</button>
+    </div>
+  </div>
+
+  <div class="main-content" id="mainContent">
+    <h2>Welcome to your dashboard</h2>
+    <p>Select an option from the menu to get started.</p>
+  </div>
+</div>
+
+<script>
+// Demo Data
+const userVideos = [
+  {title:"My First Video", likes:120, comments:15},
+  {title:"Travel Vlog", likes:95, comments:8},
+  {title:"Dance Challenge", likes:200, comments:25}
+];
+
+const followingUsers = [
+  "UserAlpha","UserBeta","UserGamma","UserDelta","UserEpsilon",
+  "UserZeta","UserEta","UserTheta","UserIota","UserKappa"
+];
+
+const followersUsers = [
+  "FanOne","FanTwo","FanThree","FanFour","FanFive",
+  "FanSix","FanSeven","FanEight","FanNine","FanTen"
+];
+
+// Functions to update main content
+function showMyVideos() {
+  const container = document.getElementById('mainContent');
+  container.innerHTML = "<h2>My Videos</h2>";
+  const list = document.createElement('div');
+  list.className = 'item-list';
+  userVideos.forEach(v => {
+    const div = document.createElement('div');
+    div.innerHTML = `<span>${v.title} - 👍 ${v.likes} - 💬 ${v.comments}</span>
+                     <button onclick="alert('Edit ${v.title} coming soon')">Edit</button>`;
+    list.appendChild(div);
+  });
+  container.appendChild(list);
+}
+
+function showMonetize() {
+  const container = document.getElementById('mainContent');
+  container.innerHTML = "<h2>Monetization</h2>";
+  // For demo, assume not monetized
+  const monetized = false; // change to true to test earnings
+  if(monetized) {
+    container.innerHTML += "<p>Your current earnings: $120.50</p>";
+  } else {
+    container.innerHTML += `<p>Steps to monetize:</p>
+      <ol>
+        <li>Upload at least 3 videos</li>
+        <li>Enable monetization in settings</li>
+        <li>Connect payment account</li>
+      </ol>`;
+  }
+}
+
+function uploadVideo() {
+  // redirect
+  location.href = 'upload.html';
+}
+
+function showFollowing() {
+  const container = document.getElementById('mainContent');
+  container.innerHTML = "<h2>Following</h2>";
+  const list = document.createElement('div');
+  list.className = 'item-list';
+  followingUsers.forEach(u => {
+    const div = document.createElement('div');
+    div.innerHTML = `<span>${u}</span><button>View</button>`;
+    list.appendChild(div);
+  });
+  container.appendChild(list);
+}
+
+function showFollowers() {
+  const container = document.getElementById('mainContent');
+  container.innerHTML = "<h2>Followers</h2>";
+  const list = document.createElement('div');
+  list.className = 'item-list';
+  followersUsers.forEach(u => {
+    const div = document.createElement('div');
+    div.innerHTML = `<span>${u}</span><button>View</button>`;
+    list.appendChild(div);
+  });
+  container.appendChild(list);
+}
+</script>
+
+</body>
+</html>
