@@ -21,19 +21,12 @@ nav button {
 }
 nav button:hover { transform: scale(1.05); }
 
-/* Button colors */
 .login-btn { background:#ff4d4f; color:#fff; }
 .dashboard-btn { background:#4CAF50; color:#fff; }
 .foru-btn { background:#ff9900; color:#fff; }
 .upload-btn { background:#00bfff; color:#fff; }
 
-main {
-  max-width:600px;
-  margin:20px auto;
-  padding:0 10px;
-  max-height:80vh;
-  overflow-y:scroll;
-}
+main { max-width:600px; margin:20px auto; padding:0 10px; max-height:80vh; overflow-y:scroll; }
 
 .video-card {
   background:#1a1a1a;
@@ -87,9 +80,9 @@ footer { text-align:center; padding:15px; background:#1f1f1f; margin-top:20px; f
     <div class="video-info">
       <h3>Awesome Video #1</h3>
       <div class="video-actions">
-        <button>👍 120</button>
-        <button>💬 15</button>
-        <button>🔗 Share</button>
+        <button class="like-btn">👍 120</button>
+        <button class="comment-btn">💬 15</button>
+        <button class="share-btn">🔗 Share</button>
       </div>
     </div>
   </div>
@@ -100,9 +93,9 @@ footer { text-align:center; padding:15px; background:#1f1f1f; margin-top:20px; f
     <div class="video-info">
       <h3>Awesome Video #2</h3>
       <div class="video-actions">
-        <button>👍 95</button>
-        <button>💬 8</button>
-        <button>🔗 Share</button>
+        <button class="like-btn">👍 95</button>
+        <button class="comment-btn">💬 8</button>
+        <button class="share-btn">🔗 Share</button>
       </div>
     </div>
   </div>
@@ -116,14 +109,14 @@ footer { text-align:center; padding:15px; background:#1f1f1f; margin-top:20px; f
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// 🔥 Replace with your Firebase config
+// 🔥 Firebase config
 const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
+  apiKey: "YOUR_API_KEY",
   authDomain: "bigula-d8cab.firebaseapp.com",
   projectId: "bigula-d8cab",
-  storageBucket: "bigula-d8cab.firebasestorage.app",
-  messagingSenderId: "76364446956",
-  appId: "1:76364446956:web:4417b1c46d6feca02ff9c9"
+  storageBucket: "bigula-d8cab.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -132,18 +125,40 @@ const auth = getAuth(app);
 const loginBtn = document.getElementById("loginBtn");
 const dashboardBtn = document.getElementById("dashboardBtn");
 const uploadBtn = document.getElementById("uploadBtn");
-
 let currentUser = null;
 
-// Monitor auth state
+// Enable/disable features for non-logged-in users
+function disableFeatures() {
+  // disable comment buttons
+  document.querySelectorAll('.comment-btn').forEach(btn => {
+    btn.disabled = true;
+    btn.onclick = () => alert("Please login to comment!");
+  });
+  // disable like buttons
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.disabled = true;
+    btn.onclick = () => alert("Please login to like!");
+  });
+  // upload button handled below
+}
+
+// Enable features for logged-in users
+function enableFeatures() {
+  document.querySelectorAll('.comment-btn').forEach(btn => btn.disabled = false);
+  document.querySelectorAll('.like-btn').forEach(btn => btn.disabled = false);
+}
+
+// Monitor login state
 onAuthStateChanged(auth, user => {
   currentUser = user;
-  if(user) {
+  if(user){
     loginBtn.style.display = "none";
     dashboardBtn.style.display = "inline-block";
+    enableFeatures();
   } else {
     loginBtn.style.display = "inline-block";
     dashboardBtn.style.display = "none";
+    disableFeatures();
   }
 });
 
