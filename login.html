@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - BIGULA</title>
-  <style>
-    body { font-family: Arial, sans-serif; background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .login-box { background-color: #1f1f1f; padding: 30px; border-radius: 10px; width: 300px; text-align: center; }
-    input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-    button { background-color: #ff4d4f; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-    a { color: #ff4d4f; display: block; margin-top: 10px; text-decoration: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - BIGULA</title>
+<style>
+body { font-family: Arial,sans-serif; background:#121212; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+.container { text-align:center; }
+h1 { font-size:2em; color:#ff4d4f; margin-bottom:30px; }
+.login-option { background:#1f1f1f; padding:20px; margin:10px 0; border-radius:10px; cursor:pointer; transition:0.2s; }
+.login-option:hover { background:#ff4d4f; color:#fff; }
+</style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Login to BIGULA</h2>
-    <input type="email" placeholder="Email" required>
-    <input type="password" placeholder="Password" required>
-    <button onclick="alert('Login functionality coming soon!')">Login</button>
-    <a href="index.html">Back to Home</a>
-  </div>
+<div class="container">
+  <h1>BIGULA</h1>
+  <div class="login-option" onclick="window.location.href='login-phone.html'">Login with Phone Number</div>
+  <div class="login-option" onclick="window.location.href='login-email.html'">Login with Email/Password</div>
+  <div class="login-option" onclick="window.location.href='login-google.html'">Login with Google</div>
+  <!-- TikTok login placeholder -->
+  <!-- <div class="login-option" onclick="window.location.href='login-tiktok.html'">Login with TikTok (Future)</div> -->
+</div>
 </body>
 </html>
