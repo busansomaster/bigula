@@ -1,81 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BIGULA - splash page</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { background-color: #121212; color: #fff; }
-    header {
-      background-color: #1f1f1f;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header h1 { color: #ff4d4f; font-size: 1.5rem; }
-    nav button {
-      margin-left: 10px;
-      background-color: #ff4d4f;
-      border: none;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    main { max-width: 600px; margin: 20px auto; padding: 0 10px; max-height: 80vh; overflow-y: scroll; }
-    .video-card { background-color: #1a1a1a; margin-bottom: 20px; border-radius: 10px; overflow: hidden; padding: 10px; }
-    .video-card video { width: 100%; border-radius: 10px; }
-    .video-info { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .video-info h3 { font-size: 1rem; color: #fff; }
-    .video-actions button { background: none; border: none; color: #fff; cursor: pointer; margin-left: 10px; font-size: 1.2rem; }
-    footer { text-align: center; padding: 15px; background-color: #1f1f1f; margin-top: 20px; font-size: 0.9rem; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIGULA Splash</title>
+<style>
+  /* Full-screen splash */
+  body, html { margin:0; padding:0; width:100%; height:100%; font-family:Arial,sans-serif; background:#121212; color:#fff; }
+  #splash { display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column; transition:opacity 1s; }
+  #splash img { width:150px; height:150px; margin-bottom:20px; animation: bounce 1.5s infinite; }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  /* Overlay */
+  #overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
+  .overlay-step { display:none; text-align:center; }
+  .overlay-step.active { display:block; }
+  .overlay-step h2 { color:#ff4d4f; margin-bottom:15px; }
+  .overlay-step p { font-size:16px; margin-bottom:20px; }
+  .overlay-buttons { display:flex; gap:10px; justify-content:center; }
+  .overlay-buttons button { padding:10px 20px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; }
+  .next-btn { background:#ff4d4f; color:#fff; }
+  .skip-btn { background:#555; color:#fff; }
+</style>
 </head>
 <body>
-  <header>
-    <h1>BIGULA</h1>
-    <nav>
-      <button onclick="location.href='login.html'">Login</button>
-      <button onclick="alert('For You feed coming soon!')">For You</button>
-      <button onclick="location.href='upload.html'">Upload</button>
-    </nav>
-  </header>
 
-  <main>
-    <!-- Video Card 1 -->
-    <div class="video-card">
-      <video src="https://www.w3schools.com/html/mov_bbb.mp4" controls></video>
-      <div class="video-info">
-        <h3>Awesome Video #1</h3>
-        <div class="video-actions">
-          <button>👍 120</button>
-          <button>💬 15</button>
-          <button>🔗 Share</button>
-        </div>
-      </div>
-    </div>
+<!-- Splash Screen -->
+<div id="splash">
+  <img src="bigula-logo.png" alt="BIGULA Logo">
+  <h1>Welcome to BIGULA</h1>
+</div>
 
-    <!-- Video Card 2 -->
-    <div class="video-card">
-      <video src="https://www.w3schools.com/html/movie.mp4" controls></video>
-      <div class="video-info">
-        <h3>Awesome Video #2</h3>
-        <div class="video-actions">
-          <button>👍 95</button>
-          <button>💬 8</button>
-          <button>🔗 Share</button>
-        </div>
-      </div>
-    </div>
+<!-- Onboarding Overlay -->
+<div id="overlay">
+  <div class="overlay-step active">
+    <h2>Discover Amazing Content</h2>
+    <p>Watch trending videos and discover creators from all over the world.</p>
+  </div>
+  <div class="overlay-step">
+    <h2>Upload Your Own Videos</h2>
+    <p>Share your creativity and connect with fans easily.</p>
+  </div>
+  <div class="overlay-step">
+    <h2>Make money from your content</h2>
+    <p>Monetize your videos through ads and grow your audience.</p>
+  </div>
+  <div class="overlay-buttons">
+    <button class="skip-btn" onclick="skipOverlay()">Skip</button>
+    <button class="next-btn" onclick="nextStep()">Next</button>
+  </div>
+</div>
 
-  </main>
+<script>
+// Show splash for 2s then onboarding
+setTimeout(() => {
+  document.getElementById('splash').style.opacity = 0;
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('overlay').style.display = 'flex';
+  }, 1000);
+}, 2000);
 
-  <footer>
-    &copy; 2026 BIGULA - Creator Video Platform
-  </footer>
+// Overlay logic
+let currentStep = 0;
+const steps = document.querySelectorAll('.overlay-step');
+
+function nextStep() {
+  steps[currentStep].classList.remove('active');
+  currentStep++;
+  if(currentStep >= steps.length) {
+    window.location.href = 'home.html';
+    return;
+  }
+  steps[currentStep].classList.add('active');
+}
+
+function skipOverlay() {
+  window.location.href = 'home.html';
+}
+</script>
+
 </body>
 </html>
-
