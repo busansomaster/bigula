@@ -5,72 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIGULA - Home</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-body { background-color: #121212; color: #fff; }
-header {
-  background-color: #1f1f1f;
-  padding: 12px 15px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-header h1 { color: #ff4d4f; font-size: 1.7rem; font-weight: bold; }
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial,sans-serif; }
+body { background:#121212; color:#fff; }
+header { background:#1f1f1f; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; }
+header h1 { color:#ff4d4f; font-size:1.7rem; font-weight:bold; }
 nav button {
-  margin-left: 8px;
-  padding: 8px 15px;
-  border-radius: 25px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.95rem;
+  margin-left:8px;
+  padding:8px 15px;
+  border-radius:25px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:0.95rem;
   transition: transform 0.2s;
 }
 nav button:hover { transform: scale(1.05); }
 
-.login-btn { background-color: #ff4d4f; color: #fff; }
-.account-btn { background-color: #4CAF50; color: #fff; }
-.foru-btn { background-color: #ff9900; color: #fff; }
-.upload-btn { background-color: #00bfff; color: #fff; }
+/* Button colors */
+.login-btn { background:#ff4d4f; color:#fff; }
+.dashboard-btn { background:#4CAF50; color:#fff; }
+.foru-btn { background:#ff9900; color:#fff; }
+.upload-btn { background:#00bfff; color:#fff; }
 
 main {
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 0 10px;
-  max-height: 80vh;
-  overflow-y: scroll;
+  max-width:600px;
+  margin:20px auto;
+  padding:0 10px;
+  max-height:80vh;
+  overflow-y:scroll;
 }
 
 .video-card {
-  background-color: #1a1a1a;
-  margin-bottom: 20px;
-  border-radius: 15px;
-  overflow: hidden;
-  padding: 10px;
+  background:#1a1a1a;
+  margin-bottom:20px;
+  border-radius:15px;
+  overflow:hidden;
+  padding:10px;
   transition: transform 0.2s, box-shadow 0.2s;
 }
-.video-card:hover { transform: scale(1.02); box-shadow: 0 0 15px #ff4d4f; }
-.video-card video { width: 100%; border-radius: 12px; }
+.video-card:hover { transform: scale(1.02); box-shadow:0 0 15px #ff4d4f; }
+.video-card video { width:100%; border-radius:12px; }
 
 .video-info {
-  margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
-.video-info h3 { font-size: 1rem; color: #fff; }
+.video-info h3 { font-size:1rem; color:#fff; }
 
 .video-actions button {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  margin-left: 10px;
-  font-size: 1.2rem;
+  background:none;
+  border:none;
+  color:#fff;
+  cursor:pointer;
+  margin-left:10px;
+  font-size:1.2rem;
   transition: transform 0.2s;
 }
 .video-actions button:hover { transform: scale(1.2); }
 
-footer { text-align: center; padding: 15px; background-color: #1f1f1f; margin-top: 20px; font-size: 0.9rem; color: #ccc; }
+footer { text-align:center; padding:15px; background:#1f1f1f; margin-top:20px; font-size:0.9rem; color:#ccc; }
 </style>
 </head>
 <body>
@@ -79,7 +74,7 @@ footer { text-align: center; padding: 15px; background-color: #1f1f1f; margin-to
   <h1>BIGULA</h1>
   <nav>
     <button id="loginBtn" class="login-btn" onclick="location.href='login.html'">Login</button>
-    <button id="accountBtn" class="account-btn" style="display:none;" onclick="location.href='my-account.html'">My Account</button>
+    <button id="dashboardBtn" class="dashboard-btn" style="display:none;" onclick="location.href='dashboard.html'">My Dashboard</button>
     <button class="foru-btn" onclick="alert('For You feed coming soon!')">For You</button>
     <button class="upload-btn" id="uploadBtn">Upload</button>
   </nav>
@@ -135,19 +130,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 const loginBtn = document.getElementById("loginBtn");
-const accountBtn = document.getElementById("accountBtn");
+const dashboardBtn = document.getElementById("dashboardBtn");
 const uploadBtn = document.getElementById("uploadBtn");
 
-// Monitor login state
 let currentUser = null;
+
+// Monitor auth state
 onAuthStateChanged(auth, user => {
   currentUser = user;
   if(user) {
     loginBtn.style.display = "none";
-    accountBtn.style.display = "inline-block";
+    dashboardBtn.style.display = "inline-block";
   } else {
     loginBtn.style.display = "inline-block";
-    accountBtn.style.display = "none";
+    dashboardBtn.style.display = "none";
   }
 });
 
