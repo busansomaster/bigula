@@ -1,25 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Video - BIGULA</title>
-  <style>
-    body { font-family: Arial, sans-serif; background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .upload-box { background-color: #1f1f1f; padding: 30px; border-radius: 10px; width: 350px; text-align: center; }
-    input[type="file"] { margin: 20px 0; }
-    input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-    button { background-color: #ff4d4f; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-    a { color: #ff4d4f; display: block; margin-top: 10px; text-decoration: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Video - BIGULA</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.upload-container {
+  background-color: #111;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 0 20px rgba(255, 0, 80, 0.2);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  color: #ff0050;
+  font-size: 24px;
+}
+
+.header p {
+  color: #aaa;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+input[type="file"],
+input[type="text"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background-color: #1f1f1f;
+  color: #fff;
+  font-size: 14px;
+}
+
+textarea {
+  resize: none;
+  height: 80px;
+}
+
+input[type="file"] {
+  padding: 6px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ff0050;
+  color: #fff;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background-color: #e60045;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.back-link a {
+  color: #ff0050;
+  text-decoration: none;
+  font-size: 14px;
+}
+</style>
 </head>
 <body>
-  <div class="upload-box">
-    <h2>Upload Video</h2>
-    <input type="file" accept="video/*">
-    <input type="text" placeholder="Video Title">
-    <button onclick="alert('Upload functionality coming soon!')">Upload</button>
-    <a href="index.html">Back to Home</a>
+
+<div class="upload-container">
+
+  <div class="header">
+    <h1>BIGULA</h1>
+    <p>Upload your video</p>
   </div>
+
+  <form id="uploadForm">
+
+    <div class="form-group">
+      <label>Select Video File</label>
+      <input type="file" id="videoFile" accept="video/*" required>
+    </div>
+
+    <div class="form-group">
+      <label>Video Title</label>
+      <input type="text" id="title" placeholder="Enter video title" required>
+    </div>
+
+    <div class="form-group">
+      <label>Category</label>
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option value="music">Music</option>
+        <option value="dance">Dance</option>
+        <option value="animals">Animals</option>
+        <option value="film and animation">Film & Animation</option>
+        <option value="people and blogs">People & Blogs</option>
+        <option value="autos and vehicles">Autos & Vehicles</option>
+        <option value="sports">Sports</option>
+        <option value="comedy">Comedy</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="news and politics">News & Politics</option>
+        <option value="fashion and style">Fashion & Style</option>
+        <option value="education">Education</option>
+        <option value="science and technology">Science & Technology</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="description" placeholder="Write video description..." required></textarea>
+    </div>
+
+    <button type="submit">Upload Video</button>
+
+  </form>
+
+  <div class="back-link">
+    <a href="home.html">Back to Home</a>
+  </div>
+
+</div>
+
+<script>
+document.getElementById("uploadForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const file = document.getElementById("videoFile").files[0];
+  const title = document.getElementById("title").value;
+  const category = document.getElementById("category").value;
+  const description = document.getElementById("description").value;
+
+  if(!file) {
+    alert("Please select a video file.");
+    return;
+  }
+
+  alert("Upload system will be connected to Firestore next 🚀");
+});
+</script>
+
 </body>
 </html>
