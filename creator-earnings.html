@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIGULA - Creator Earnings</title>
+<style>
+body { font-family: Arial; background:#121212; color:#fff; }
+.container { max-width:800px; margin:50px auto; padding:20px; background:#1f1f1f; border-radius:15px; }
+h2 { color:#ff4d4f; }
+.card { background:#1a1a1a; padding:15px; border-radius:10px; margin:10px 0; }
+button { background:#ff4d4f; color:#fff; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Creator Earnings</h2>
+  <div class="card">
+    <p><strong>Total Earnings:</strong> $15.75</p>
+    <p><strong>Payment Method:</strong> PayPal (Active)</p>
+    <p><strong>Next Payout:</strong> 1st March 2026</p>
+    <button onclick="withdraw()">Withdraw</button>
+  </div>
+  <div class="card">
+    <p><strong>Upload Stats:</strong> 5 Videos Uploaded</p>
+    <p><strong>Followers:</strong> 1200</p>
+  </div>
+</div>
+
+<script>
+function withdraw() {
+  const balance = 15.75;
+  if(balance < 10) {
+    alert("Minimum payout is $10");
+    return;
+  }
+  alert("Withdrawal request submitted. Funds will arrive in 1-3 business days.");
+}
+</script>
+</body>
+</html>
