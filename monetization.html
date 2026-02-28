@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIGULA Monetization</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Roboto',sans-serif;
+  background:#f9f9f9;
+  color:#111;
+}
+
+.header{
+  background:#fff;
+  padding:15px 25px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header h1{
+  color:#ff4d4f;
+  font-size:1.4rem;
+}
+
+.container{
+  max-width:900px;
+  margin:40px auto;
+  background:#fff;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+h2{
+  margin-bottom:10px;
+}
+
+.progress-box{
+  background:#f1f1f1;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:25px;
+}
+
+.progress{
+  height:10px;
+  background:#ddd;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.progress-fill{
+  height:100%;
+  width:0%;
+  background:#ff4d4f;
+  transition:0.4s;
+}
+
+.requirements{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.req-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px;
+  border:1px solid #eee;
+  border-radius:10px;
+}
+
+.req-item span{
+  font-weight:500;
+}
+
+.status{
+  font-weight:bold;
+}
+
+.complete{
+  color:green;
+}
+
+.incomplete{
+  color:#ff4d4f;
+}
+
+button{
+  margin-top:25px;
+  padding:12px 20px;
+  border:none;
+  border-radius:25px;
+  font-weight:500;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.enable-btn{
+  background:#111;
+  color:#fff;
+}
+
+.enable-btn:disabled{
+  background:#999;
+  cursor:not-allowed;
+}
+
+.back-btn{
+  background:#eee;
+  margin-left:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>BIGULA Studio - Monetization</h1>
+  <button onclick="location.href='my-dashboard.html'">Back to Dashboard</button>
+</div>
+
+<div class="container">
+  <h2>Monetization Requirements</h2>
+  <p>Complete all steps below to enable monetization on your account.</p>
+
+  <div class="progress-box">
+    <strong>Overall Progress</strong>
+    <div class="progress">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="requirements">
+
+    <div class="req-item">
+      <span>Reach 1,000 Followers</span>
+      <span id="followersStatus" class="status incomplete">0 / 1000</span>
+    </div>
+
+    <div class="req-item">
+      <span>Upload at least 5 Videos</span>
+      <span id="videosStatus" class="status incomplete">0 / 5</span>
+    </div>
+
+    <div class="req-item">
+      <span>No Copyright Claims</span>
+      <span id="copyrightStatus" class="status incomplete">Checking...</span>
+    </div>
+
+  </div>
+
+  <button id="enableBtn" class="enable-btn" disabled onclick="enableMonetization()">
+    Enable Monetization
+  </button>
+
+</div>
+
+<script>
+
+// DEMO DATA (Replace with Firestore later)
+let followersCount = 850;     // change for testing
+let videosUploaded = 4;       // change for testing
+let copyrightClaims = 0;      // must be 0
+
+function checkRequirements(){
+
+  let completed = 0;
+  let total = 3;
+
+  // Followers
+  if(followersCount >= 1000){
+    document.getElementById('followersStatus').innerHTML = "✔ 1000+";
+    document.getElementById('followersStatus').className = "status complete";
+    completed++;
+  }else{
+    document.getElementById('followersStatus').innerHTML =
+      followersCount + " / 1000";
+  }
+
+  // Videos
+  if(videosUploaded >= 5){
+    document.getElementById('videosStatus').innerHTML = "✔ 5+ Videos";
+    document.getElementById('videosStatus').className = "status complete";
+    completed++;
+  }else{
+    document.getElementById('videosStatus').innerHTML =
+      videosUploaded + " / 5";
+  }
+
+  // Copyright
+  if(copyrightClaims === 0){
+    document.getElementById('copyrightStatus').innerHTML = "✔ No Claims";
+    document.getElementById('copyrightStatus').className = "status complete";
+    completed++;
+  }else{
+    document.getElementById('copyrightStatus').innerHTML =
+      copyrightClaims + " Claim(s)";
+  }
+
+  // Update Progress Bar
+  let percent = (completed / total) * 100;
+  document.getElementById('progressFill').style.width = percent + "%";
+
+  // Enable Button
+  if(completed === total){
+    document.getElementById('enableBtn').disabled = false;
+  }
+}
+
+function enableMonetization(){
+  alert("Monetization Enabled Successfully!");
+  window.location.href = "final-monetize.html";
+}
+
+checkRequirements();
+
+</script>
+
+</body>
+</html>
