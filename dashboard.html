@@ -4,29 +4,125 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIGULA - My Dashboard</title>
+
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family: Arial,sans-serif; }
-body { background:#121212; color:#fff; }
-header { background:#1f1f1f; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
-header h1 { color:#ff4d4f; font-size:1.8rem; }
-header button { background:#ff4d4f; color:#fff; border:none; padding:8px 16px; border-radius:25px; font-weight:bold; cursor:pointer; }
 
-.container { display:flex; max-width:1000px; margin:20px auto; gap:20px; min-height: 70vh; }
-.sidebar { width:220px; background:#1f1f1f; padding:20px; border-radius:15px; display:flex; flex-direction:column; justify-content:space-between; }
-.sidebar .menu { display:flex; flex-direction:column; }
-.sidebar button { width:100%; padding:10px 0; margin-bottom:10px; border:none; border-radius:10px; background:#ff4d4f; color:#fff; font-weight:bold; cursor:pointer; transition:0.2s; }
-.sidebar button:hover { background:#ff6666; }
+body { background:#0f0f0f; color:#fff; }
 
-.main-content { flex:1; background:#1a1a1a; padding:20px; border-radius:15px; overflow-y:auto; max-height: 70vh; }
-.main-content h2 { color:#ff4d4f; margin-bottom:15px; }
-.item-list { display:flex; flex-direction:column; gap:10px; }
-.item-list div { background:#121212; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; }
-.item-list div span { font-size:0.9rem; }
-.item-list div button { background:#00bfff; color:#fff; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; }
+header {
+  background:#1a1a1a;
+  padding:15px 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-.footer-nav { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
-.footer-nav button { width:100%; padding:10px 0; border:none; border-radius:10px; background:#555; color:#fff; font-weight:bold; cursor:pointer; transition:0.2s; }
-.footer-nav button:hover { background:#777; }
+header h1 { color:#ff0050; font-size:1.6rem; }
+
+header button {
+  background:#ff0050;
+  border:none;
+  padding:8px 18px;
+  border-radius:20px;
+  color:#fff;
+  cursor:pointer;
+}
+
+.container {
+  display:flex;
+  width:95%;
+  margin:20px auto;
+  gap:20px;
+  min-height:75vh;
+}
+
+.sidebar {
+  width:180px; /* smaller */
+  background:#161616;
+  padding:15px;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.sidebar .menu button {
+  width:100%;
+  padding:8px;
+  margin-bottom:8px;
+  font-size:13px;
+  border:none;
+  border-radius:8px;
+  background:#ff0050;
+  color:#fff;
+  cursor:pointer;
+}
+
+.sidebar .menu button:hover {
+  background:#e60045;
+}
+
+.footer-nav button {
+  width:100%;
+  padding:8px;
+  margin-top:8px;
+  font-size:13px;
+  border:none;
+  border-radius:8px;
+  background:#333;
+  color:#fff;
+  cursor:pointer;
+}
+
+.main-content {
+  flex:1; /* takes most space */
+  background:#141414;
+  padding:25px;
+  border-radius:12px;
+  overflow-y:auto;
+}
+
+.main-content h2 {
+  color:#ff0050;
+  margin-bottom:20px;
+}
+
+.video-item {
+  background:#1c1c1c;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:12px;
+}
+
+.video-item p {
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.progress-bar {
+  width:100%;
+  background:#333;
+  height:8px;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:6px;
+}
+
+.progress-fill {
+  height:8px;
+  background:#ff0050;
+}
+
+.monetize-btn {
+  margin-top:15px;
+  padding:10px 15px;
+  background:#00c853;
+  border:none;
+  border-radius:8px;
+  color:#fff;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -37,6 +133,7 @@ header button { background:#ff4d4f; color:#fff; border:none; padding:8px 16px; b
 </header>
 
 <div class="container">
+
   <div class="sidebar">
     <div class="menu">
       <button onclick="showMyVideos()">My Videos</button>
@@ -45,8 +142,9 @@ header button { background:#ff4d4f; color:#fff; border:none; padding:8px 16px; b
       <button onclick="showFollowing()">Following</button>
       <button onclick="showFollowers()">Followers</button>
     </div>
+
     <div class="footer-nav">
-      <button onclick="location.href='my-dashboard.html'">My Account</button>
+      <button onclick="location.href='account.html'">My Account</button>
       <button onclick="location.href='home.html'">Home</button>
       <button onclick="location.href='inbox.html'">Inbox</button>
     </div>
@@ -54,90 +152,105 @@ header button { background:#ff4d4f; color:#fff; border:none; padding:8px 16px; b
 
   <div class="main-content" id="mainContent">
     <h2>Welcome to your dashboard</h2>
-    <p>Select an option from the menu to get started.</p>
+    <p>Select an option from the menu.</p>
   </div>
+
 </div>
 
-<script>
-// Demo Data
-const userVideos = [
-  {title:"My First Video", likes:120, comments:15},
-  {title:"Travel Vlog", likes:95, comments:8},
-  {title:"Dance Challenge", likes:200, comments:25}
-];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const followingUsers = [
-  "UserAlpha","UserBeta","UserGamma","UserDelta","UserEpsilon",
-  "UserZeta","UserEta","UserTheta","UserIota","UserKappa"
-];
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
+};
 
-const followersUsers = [
-  "FanOne","FanTwo","FanThree","FanFour","FanFive",
-  "FanSix","FanSeven","FanEight","FanNine","FanTen"
-];
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Functions to update main content
-function showMyVideos() {
-  const container = document.getElementById('mainContent');
-  container.innerHTML = "<h2>My Videos</h2>";
-  const list = document.createElement('div');
-  list.className = 'item-list';
-  userVideos.forEach(v => {
-    const div = document.createElement('div');
-    div.innerHTML = `<span>${v.title} - 👍 ${v.likes} - 💬 ${v.comments}</span>
-                     <button onclick="alert('Edit ${v.title} coming soon')">Edit</button>`;
-    list.appendChild(div);
-  });
-  container.appendChild(list);
-}
-
-function showMonetize() {
-  const container = document.getElementById('mainContent');
-  container.innerHTML = "<h2>Monetization</h2>";
-  // For demo, assume not monetized
-  const monetized = false; // change to true to test earnings
-  if(monetized) {
-    container.innerHTML += "<p>Your current earnings: $120.50</p>";
-  } else {
-    container.innerHTML += `<p>Steps to monetize:</p>
-      <ol>
-        <li>Upload at least 3 videos</li>
-        <li>Enable monetization in settings</li>
-        <li>Connect payment account</li>
-      </ol>`;
-  }
-}
+const main = document.getElementById("mainContent");
 
 function uploadVideo() {
-  // redirect
-  location.href = 'upload.html';
+  location.href = "upload.html";
 }
 
-function showFollowing() {
-  const container = document.getElementById('mainContent');
-  container.innerHTML = "<h2>Following</h2>";
-  const list = document.createElement('div');
-  list.className = 'item-list';
-  followingUsers.forEach(u => {
-    const div = document.createElement('div');
-    div.innerHTML = `<span>${u}</span><button>View</button>`;
-    list.appendChild(div);
-  });
-  container.appendChild(list);
-}
+window.showMyVideos = function() {
+  main.innerHTML = "<h2>My Videos</h2>";
 
-function showFollowers() {
-  const container = document.getElementById('mainContent');
-  container.innerHTML = "<h2>Followers</h2>";
-  const list = document.createElement('div');
-  list.className = 'item-list';
-  followersUsers.forEach(u => {
-    const div = document.createElement('div');
-    div.innerHTML = `<span>${u}</span><button>View</button>`;
-    list.appendChild(div);
+  const user = auth.currentUser;
+  if (!user) {
+    main.innerHTML += "<p>Please login.</p>";
+    return;
+  }
+
+  const q = query(
+    collection(db, "videos"),
+    where("creatorId", "==", user.uid)
+  );
+
+  onSnapshot(q, (snapshot) => {
+    main.innerHTML = "<h2>My Videos</h2>";
+
+    snapshot.forEach(doc => {
+      const video = doc.data();
+
+      const div = document.createElement("div");
+      div.className = "video-item";
+
+      if(video.status === "uploading") {
+        div.innerHTML = `
+          <p><strong>${video.title}</strong></p>
+          <p>Status: Uploading (${video.progress || 0}%)</p>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${video.progress || 0}%"></div>
+          </div>
+        `;
+      } else {
+        div.innerHTML = `
+          <p><strong>${video.title}</strong></p>
+          <p>Status: Published</p>
+          <p>👁 ${video.views} | ❤️ ${video.likesCount} | 💬 ${video.commentsCount}</p>
+        `;
+      }
+
+      main.appendChild(div);
+    });
   });
-  container.appendChild(list);
-}
+};
+
+window.showMonetize = function() {
+  main.innerHTML = "<h2>Monetization</h2>";
+
+  const monetized = false; // Keep existing logic untouched
+
+  if(monetized) {
+    main.innerHTML += "<p>Your earnings: $0.00</p>";
+  } else {
+    main.innerHTML += `
+      <p>To begin monetizing:</p>
+      <ul>
+        <li>Upload at least 3 videos</li>
+        <li>Get 1,000 views total</li>
+        <li>Follow community guidelines</li>
+      </ul>
+      <button class="monetize-btn" onclick="location.href='monetize.html'">
+        Begin Monetize
+      </button>
+    `;
+  }
+};
+
+window.showFollowing = function() {
+  main.innerHTML = "<h2>Following</h2><p>Following list coming soon...</p>";
+};
+
+window.showFollowers = function() {
+  main.innerHTML = "<h2>Followers</h2><p>Followers list coming soon...</p>";
+};
 </script>
 
 </body>
