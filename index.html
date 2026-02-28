@@ -8,14 +8,14 @@
   /* Full-screen splash */
   body, html { margin:0; padding:0; width:100%; height:100%; font-family:Arial,sans-serif; background:#121212; color:#fff; }
   #splash { display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column; transition:opacity 1s; }
-  #splash img { width:150px; height:150px; margin-bottom:20px; animation: bounce 1.5s infinite; }
+  #splash h1 { font-size:2rem; color:#ff4d4f; animation: bounce 1.5s infinite; }
   @keyframes bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-15px); }
   }
 
   /* Overlay */
-  #overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
+  #overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
   .overlay-step { display:none; text-align:center; }
   .overlay-step.active { display:block; }
   .overlay-step h2 { color:#ff4d4f; margin-bottom:15px; }
@@ -30,7 +30,6 @@
 
 <!-- Splash Screen -->
 <div id="splash">
-  <img src="bigula-logo.png" alt="BIGULA Logo">
   <h1>Welcome to BIGULA</h1>
 </div>
 
@@ -54,19 +53,55 @@
   </div>
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-storage-compat.js"></script>
 <script>
-// Show splash for 2s then onboarding
-setTimeout(() => {
-  document.getElementById('splash').style.opacity = 0;
-  setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
-    document.getElementById('overlay').style.display = 'flex';
-  }, 1000);
-}, 2000);
+  // TODO: Replace with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "bigula-d8cab.firebaseapp.com",
+    projectId: "bigula-d8cab",
+    storageBucket: "bigula-d8cab.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+</script>
 
-// Overlay logic
-let currentStep = 0;
+<script>
+const splash = document.getElementById('splash');
+const overlay = document.getElementById('overlay');
 const steps = document.querySelectorAll('.overlay-step');
+let currentStep = 0;
+
+// Check if user has visited before
+const firstVisit = localStorage.getItem('bigula_first_visit');
+
+function showOverlay() {
+  splash.style.opacity = 0;
+  setTimeout(() => {
+    splash.style.display = 'none';
+    overlay.style.display = 'flex';
+  }, 1000);
+}
+
+// Only show onboarding if first visit
+if(!firstVisit) {
+  setTimeout(showOverlay, 2000);
+  localStorage.setItem('bigula_first_visit', 'true');
+} else {
+  // Skip overlay, show splash briefly then redirect
+  setTimeout(() => {
+    splash.style.opacity = 0;
+    setTimeout(() => window.location.href = 'home.html', 1000);
+  }, 2000);
+}
 
 function nextStep() {
   steps[currentStep].classList.remove('active');
