@@ -3,173 +3,262 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BIGULA - Home</title>
+<title>BIGULA</title>
+
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family: Arial,sans-serif; }
-body { background:#121212; color:#fff; }
-header { background:#1f1f1f; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; }
-header h1 { color:#ff4d4f; font-size:1.7rem; font-weight:bold; }
-nav button {
-  margin-left:8px;
-  padding:8px 15px;
-  border-radius:25px;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-  font-size:0.95rem;
-  transition: transform 0.2s;
-}
-nav button:hover { transform: scale(1.05); }
+* { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
+body { background:#000; color:#fff; }
 
-.login-btn { background:#ff4d4f; color:#fff; }
-.dashboard-btn { background:#4CAF50; color:#fff; }
-.foru-btn { background:#ff9900; color:#fff; }
-.upload-btn { background:#00bfff; color:#fff; }
-
-main { max-width:600px; margin:20px auto; padding:0 10px; max-height:80vh; overflow-y:scroll; }
-
-.video-card {
-  background:#1a1a1a;
-  margin-bottom:20px;
-  border-radius:15px;
-  overflow:hidden;
-  padding:10px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.video-card:hover { transform: scale(1.02); box-shadow:0 0 15px #ff4d4f; }
-.video-card video { width:100%; border-radius:12px; }
-
-.video-info {
-  margin-top:10px;
+.top-nav {
+  position:fixed;
+  top:0;
+  width:100%;
+  background:#000;
+  padding:12px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  border-bottom:1px solid #222;
+  z-index:1000;
 }
-.video-info h3 { font-size:1rem; color:#fff; }
 
-.video-actions button {
+.filter-btn {
+  background:none;
+  border:none;
+  color:#aaa;
+  font-weight:bold;
+  cursor:pointer;
+  margin:0 6px;
+}
+
+.filter-btn.active { color:#ff0050; }
+
+.search-bar {
+  position:fixed;
+  top:60px;
+  width:100%;
+  padding:10px;
+  background:#111;
+  display:none;
+}
+
+.search-bar input {
+  width:100%;
+  padding:10px;
+  border-radius:25px;
+  border:none;
+}
+
+.feed {
+  margin-top:110px;
+  margin-bottom:70px;
+  padding:10px;
+}
+
+.video-card { margin-bottom:30px; }
+video { width:100%; border-radius:12px; }
+
+.video-info h3 { font-size:16px; margin-top:6px; }
+.video-info p { font-size:13px; color:#bbb; }
+
+.actions {
+  display:flex;
+  gap:15px;
+  margin-top:6px;
+}
+
+.actions button {
   background:none;
   border:none;
   color:#fff;
   cursor:pointer;
-  margin-left:10px;
-  font-size:1.2rem;
-  transition: transform 0.2s;
 }
-.video-actions button:hover { transform: scale(1.2); }
 
-footer { text-align:center; padding:15px; background:#1f1f1f; margin-top:20px; font-size:0.9rem; color:#ccc; }
+.actions button.disabled {
+  opacity:0.4;
+  cursor:not-allowed;
+}
+
+.footer {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#000;
+  border-top:1px solid #222;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+}
 </style>
 </head>
 <body>
 
-<header>
-  <h1>BIGULA</h1>
-  <nav>
-    <button id="loginBtn" class="login-btn" onclick="location.href='login.html'">Login</button>
-    <button id="dashboardBtn" class="dashboard-btn" style="display:none;" onclick="location.href='dashboard.html'">My Dashboard</button>
-    <button class="foru-btn" onclick="alert('For You feed coming soon!')">For You</button>
-    <button class="upload-btn" id="uploadBtn">Upload</button>
-  </nav>
-</header>
-
-<main>
-  <!-- Video Card 1 -->
-  <div class="video-card">
-    <video src="https://www.w3schools.com/html/mov_bbb.mp4" controls></video>
-    <div class="video-info">
-      <h3>Awesome Video #1</h3>
-      <div class="video-actions">
-        <button class="like-btn">👍 120</button>
-        <button class="comment-btn">💬 15</button>
-        <button class="share-btn">🔗 Share</button>
-      </div>
-    </div>
+<div class="top-nav">
+  <button id="searchBtn">🔍</button>
+  <div>
+    <button class="filter-btn active" id="latestBtn">Latest</button>
+    <button class="filter-btn" id="viralBtn">Viral</button>
+    <button class="filter-btn" id="forYouBtn">For You</button>
   </div>
+  <span style="color:#ff0050;font-weight:bold;">BIGULA</span>
+</div>
 
-  <!-- Video Card 2 -->
-  <div class="video-card">
-    <video src="https://www.w3schools.com/html/movie.mp4" controls></video>
-    <div class="video-info">
-      <h3>Awesome Video #2</h3>
-      <div class="video-actions">
-        <button class="like-btn">👍 95</button>
-        <button class="comment-btn">💬 8</button>
-        <button class="share-btn">🔗 Share</button>
-      </div>
-    </div>
-  </div>
-</main>
+<div class="search-bar" id="searchBar">
+  <input type="text" id="searchInput" placeholder="Search users or titles...">
+</div>
 
-<footer>
-  &copy; 2026 BIGULA - Creator Video Platform
-</footer>
+<div class="feed" id="feed"></div>
+
+<div class="footer">
+  <button>🔔</button>
+  <button onclick="location.href='home.html'">🏠</button>
+  <button onclick="location.href='account.html'">👤</button>
+</div>
 
 <script type="module">
+import { baseVideos } from './data.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// 🔥 Firebase config
 const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
+  apiKey: "YOUR_API_KEY",
   authDomain: "bigula-d8cab.firebaseapp.com",
-  projectId: "bigula-d8cab",
-  storageBucket: "bigula-d8cab.firebasestorage.app",
-  messagingSenderId: "76364446956",
-  appId: "1:76364446956:web:4417b1c46d6feca02ff9c9"
+  projectId: "bigula-d8cab"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const loginBtn = document.getElementById("loginBtn");
-const dashboardBtn = document.getElementById("dashboardBtn");
-const uploadBtn = document.getElementById("uploadBtn");
 let currentUser = null;
+onAuthStateChanged(auth, user => currentUser = user);
 
-// Enable/disable features for non-logged-in users
-function disableFeatures() {
-  // disable comment buttons
-  document.querySelectorAll('.comment-btn').forEach(btn => {
-    btn.disabled = true;
-    btn.onclick = () => alert("Please login to comment!");
-  });
-  // disable like buttons
-  document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.disabled = true;
-    btn.onclick = () => alert("Please login to like!");
-  });
-  // upload button handled below
+const feed = document.getElementById("feed");
+
+function getStats() {
+  return JSON.parse(localStorage.getItem("videoStats")) || {};
 }
 
-// Enable features for logged-in users
-function enableFeatures() {
-  document.querySelectorAll('.comment-btn').forEach(btn => btn.disabled = false);
-  document.querySelectorAll('.like-btn').forEach(btn => btn.disabled = false);
+function saveStats(stats) {
+  localStorage.setItem("videoStats", JSON.stringify(stats));
 }
 
-// Monitor login state
-onAuthStateChanged(auth, user => {
-  currentUser = user;
-  if(user){
-    loginBtn.style.display = "none";
-    dashboardBtn.style.display = "inline-block";
-    enableFeatures();
-  } else {
-    loginBtn.style.display = "inline-block";
-    dashboardBtn.style.display = "none";
-    disableFeatures();
+function ensureVideoStats(videoId) {
+  let stats = getStats();
+  if(!stats[videoId]) {
+    stats[videoId] = { views:0, likes:0, comments:0 };
+    saveStats(stats);
   }
-});
+}
 
-// Upload button click
-uploadBtn.addEventListener('click', () => {
-  if(!currentUser) {
-    alert("Please login first to upload.");
-    location.href = 'login.html';
-  } else {
-    location.href = 'upload.html';
-  }
+function renderVideos(videoList) {
+  feed.innerHTML = "";
+
+  videoList.forEach(video => {
+    ensureVideoStats(video.id);
+    let stats = getStats()[video.id];
+
+    const card = document.createElement("div");
+    card.className = "video-card";
+
+    card.innerHTML = `
+      <video src="${video.videoUrl}" data-id="${video.id}"></video>
+      <div class="video-info">
+        <h3>${video.title}</h3>
+        <p>${video.description}</p>
+        <p>@${video.creator}</p>
+        <p>${new Date(video.createdAt).toLocaleString()}</p>
+        <div class="actions">
+          <button class="like-btn" data-id="${video.id}">
+            ❤️ ${stats.likes}
+          </button>
+          <button class="comment-btn" data-id="${video.id}">
+            💬 ${stats.comments}
+          </button>
+          <span>👁 ${stats.views}</span>
+        </div>
+      </div>
+    `;
+
+    feed.appendChild(card);
+  });
+
+  attachEvents();
+}
+
+function attachEvents() {
+
+  document.querySelectorAll("video").forEach(video => {
+    video.addEventListener("play", () => {
+      const id = video.dataset.id;
+      let stats = getStats();
+      stats[id].views++;
+      saveStats(stats);
+      renderVideos(currentVideos);
+    });
+  });
+
+  document.querySelectorAll(".like-btn").forEach(btn => {
+    if(!currentUser) {
+      btn.classList.add("disabled");
+      btn.onclick = () => alert("Login to like videos");
+    } else {
+      btn.onclick = () => {
+        let id = btn.dataset.id;
+        let stats = getStats();
+        stats[id].likes++;
+        saveStats(stats);
+        renderVideos(currentVideos);
+      };
+    }
+  });
+
+  document.querySelectorAll(".comment-btn").forEach(btn => {
+    if(!currentUser) {
+      btn.classList.add("disabled");
+      btn.onclick = () => alert("Login to comment");
+    } else {
+      btn.onclick = () => {
+        let id = btn.dataset.id;
+        let stats = getStats();
+        stats[id].comments++;
+        saveStats(stats);
+        renderVideos(currentVideos);
+      };
+    }
+  });
+}
+
+let currentVideos = [...baseVideos];
+
+// Latest default
+currentVideos.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+renderVideos(currentVideos);
+
+// Viral
+document.getElementById("viralBtn").onclick = () => {
+  let stats = getStats();
+  currentVideos.sort((a,b)=> (stats[b.id]?.views||0)-(stats[a.id]?.views||0));
+  renderVideos(currentVideos);
+};
+
+// For You (random demo)
+document.getElementById("forYouBtn").onclick = () => {
+  currentVideos.sort(()=>0.5-Math.random());
+  renderVideos(currentVideos);
+};
+
+// Search
+document.getElementById("searchBtn").onclick = ()=>{
+  document.getElementById("searchBar").style.display="block";
+};
+
+document.getElementById("searchInput").addEventListener("input", e=>{
+  const q = e.target.value.toLowerCase();
+  const filtered = baseVideos.filter(v =>
+    v.title.toLowerCase().includes(q) ||
+    v.creator.toLowerCase().includes(q)
+  );
+  renderVideos(filtered);
 });
 </script>
 
