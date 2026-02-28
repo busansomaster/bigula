@@ -1,185 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Video - BIGULA</title>
-
+<title>Upload - BIGULA</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+body { background:#000; color:#fff; font-family:Arial; display:flex; justify-content:center; align-items:center; height:100vh; }
+.container { background:#111; padding:30px; border-radius:12px; width:400px; }
+h1 { color:#ff0050; text-align:center; }
+input, select, textarea {
+  width:100%; padding:10px; margin-bottom:12px;
+  background:#1f1f1f; border:none; color:#fff;
 }
-
-body {
-  background-color: #000;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.upload-container {
-  background-color: #111;
-  padding: 30px;
-  border-radius: 12px;
-  width: 400px;
-  box-shadow: 0 0 20px rgba(255, 0, 80, 0.2);
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.header h1 {
-  color: #ff0050;
-  font-size: 24px;
-}
-
-.header p {
-  color: #aaa;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #ccc;
-}
-
-input[type="file"],
-input[type="text"],
-select,
-textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-  background-color: #1f1f1f;
-  color: #fff;
-  font-size: 14px;
-}
-
-textarea {
-  resize: none;
-  height: 80px;
-}
-
-input[type="file"] {
-  padding: 6px;
-}
-
 button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background-color: #ff0050;
-  color: #fff;
-  font-weight: bold;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-button:hover {
-  background-color: #e60045;
-}
-
-.back-link {
-  text-align: center;
-  margin-top: 15px;
-}
-
-.back-link a {
-  color: #ff0050;
-  text-decoration: none;
-  font-size: 14px;
+  width:100%; padding:12px;
+  background:#ff0050; border:none;
+  color:#fff; font-weight:bold;
+  cursor:pointer;
 }
 </style>
 </head>
 <body>
 
-<div class="upload-container">
+<div class="container">
+<h1>Upload Video</h1>
 
-  <div class="header">
-    <h1>BIGULA</h1>
-    <p>Upload your video</p>
-  </div>
+<form id="uploadForm">
+<input type="file" id="videoFile" accept="video/*" required>
+<input type="text" id="title" placeholder="Title" required>
 
-  <form id="uploadForm">
+<select id="category" required>
+<option value="">Select Category</option>
+<option value="music">Music</option>
+<option value="dance">Dance</option>
+<option value="animals">Animals</option>
+<option value="film and animation">Film & Animation</option>
+<option value="people and blogs">People & Blogs</option>
+<option value="autos and vehicles">Autos & Vehicles</option>
+<option value="sports">Sports</option>
+<option value="comedy">Comedy</option>
+<option value="entertainment">Entertainment</option>
+<option value="news and politics">News & Politics</option>
+<option value="fashion and style">Fashion & Style</option>
+<option value="education">Education</option>
+<option value="science and technology">Science & Technology</option>
+</select>
 
-    <div class="form-group">
-      <label>Select Video File</label>
-      <input type="file" id="videoFile" accept="video/*" required>
-    </div>
+<textarea id="description" placeholder="Description" required></textarea>
 
-    <div class="form-group">
-      <label>Video Title</label>
-      <input type="text" id="title" placeholder="Enter video title" required>
-    </div>
-
-    <div class="form-group">
-      <label>Category</label>
-      <select id="category" required>
-        <option value="">Select Category</option>
-        <option value="music">Music</option>
-        <option value="dance">Dance</option>
-        <option value="animals">Animals</option>
-        <option value="film and animation">Film & Animation</option>
-        <option value="people and blogs">People & Blogs</option>
-        <option value="autos and vehicles">Autos & Vehicles</option>
-        <option value="sports">Sports</option>
-        <option value="comedy">Comedy</option>
-        <option value="entertainment">Entertainment</option>
-        <option value="news and politics">News & Politics</option>
-        <option value="fashion and style">Fashion & Style</option>
-        <option value="education">Education</option>
-        <option value="science and technology">Science & Technology</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Description</label>
-      <textarea id="description" placeholder="Write video description..." required></textarea>
-    </div>
-
-    <button type="submit">Upload Video</button>
-
-  </form>
-
-  <div class="back-link">
-    <a href="home.html">Back to Home</a>
-  </div>
-
+<button type="submit">Start Upload</button>
+</form>
 </div>
 
-<script>
-document.getElementById("uploadForm").addEventListener("submit", function(e){
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+document.getElementById("uploadForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Please login first.");
+    return;
+  }
 
   const file = document.getElementById("videoFile").files[0];
   const title = document.getElementById("title").value;
   const category = document.getElementById("category").value;
   const description = document.getElementById("description").value;
 
-  if(!file) {
-    alert("Please select a video file.");
-    return;
-  }
+  // 1️⃣ Create Firestore doc first
+  const videoDoc = await addDoc(collection(db, "videos"), {
+    title,
+    description,
+    category,
+    creatorId: user.uid,
+    creatorName: user.email,
+    createdAt: serverTimestamp(),
+    status: "uploading",
+    progress: 0,
+    views: 0,
+    likesCount: 0,
+    commentsCount: 0,
+    videoUrl: ""
+  });
 
-  alert("Upload system will be connected to Firestore next 🚀");
+  const storageRef = ref(storage, `videos/${videoDoc.id}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
+
+  // 2️⃣ Redirect immediately to dashboard
+  window.location.href = "dashboard.html?tab=myvideos";
+
+  // 3️⃣ Continue upload in background
+  uploadTask.on("state_changed",
+    async (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+      await updateDoc(doc(db, "videos", videoDoc.id), {
+        progress: Math.floor(progress)
+      });
+    },
+    (error) => {
+      console.error(error);
+    },
+    async () => {
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+      await updateDoc(doc(db, "videos", videoDoc.id), {
+        videoUrl: downloadURL,
+        status: "published",
+        progress: 100
+      });
+    }
+  );
 });
 </script>
 
