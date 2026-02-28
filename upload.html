@@ -52,18 +52,18 @@ button {
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
+  apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
   authDomain: "bigula-d8cab.firebaseapp.com",
   projectId: "bigula-d8cab",
-    storageBucket: "bigula-d8cab.firebasestorage.app",
+  storageBucket: "bigula-d8cab.firebasestorage.app",
 };
-
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -84,7 +84,7 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
   const category = document.getElementById("category").value;
   const description = document.getElementById("description").value;
 
-  // 1️⃣ Create Firestore doc first
+  // 1️⃣ Create Firestore document first
   const videoDoc = await addDoc(collection(db, "videos"), {
     title,
     description,
@@ -92,11 +92,13 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
     creatorId: user.uid,
     creatorName: user.email,
     createdAt: serverTimestamp(),
-    status: "uploading",
+    videoStatus: "uploading",
+    copyrightStatus: "clean",
     progress: 0,
     views: 0,
-    likesCount: 0,
+    likes: 0,
     commentsCount: 0,
+    monetized: false,
     videoUrl: ""
   });
 
@@ -123,14 +125,15 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
 
       await updateDoc(doc(db, "videos", videoDoc.id), {
         videoUrl: downloadURL,
-        status: "published",
+        videoStatus: "active",
         progress: 100
       });
     }
   );
+
 });
+
 </script>
 
 </body>
 </html>
-
