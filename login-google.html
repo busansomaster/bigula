@@ -12,6 +12,7 @@ a { color:#ff4d4f; display:block; margin-top:15px; text-decoration:none; }
 </style>
 </head>
 <body>
+
 <div class="login-box">
 <h2>BIGULA Google Login</h2>
 <button onclick="googleLogin()">Sign in with Google</button>
@@ -19,26 +20,39 @@ a { color:#ff4d4f; display:block; margin-top:15px; text-decoration:none; }
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
+  apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
   authDomain: "bigula-d8cab.firebaseapp.com",
   projectId: "bigula-d8cab",
   storageBucket: "bigula-d8cab.firebasestorage.app",
   messagingSenderId: "76364446956",
   appId: "1:76364446956:web:4417b1c46d6feca02ff9c9"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// ✅ If already logged in → go directly to home
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = "home.html";
+  }
+});
+
 window.googleLogin = function() {
   signInWithPopup(auth, provider)
-    .then(() => { alert("Login successful!"); window.location.href="index.html"; })
+    .then(() => {
+      window.location.href = "home.html";
+    })
     .catch(e => alert(e.message));
 };
+
 </script>
+
 </body>
 </html>
