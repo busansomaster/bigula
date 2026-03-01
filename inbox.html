@@ -34,6 +34,7 @@ header h1 {
 .notification-item {
   display:flex;
   align-items:center;
+  justify-content:space-between;
   background:#2a2a3a;
   padding:12px;
   border-radius:10px;
@@ -45,19 +46,39 @@ header h1 {
   background:#ff4d4f;
   color:#fff;
 }
-.notification-item img {
+.notification-left {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:1;
+}
+.notification-left img {
   width:40px;
   height:40px;
   border-radius:50%;
   object-fit:cover;
 }
-.notification-item span {
+.notification-left .text {
   flex:1;
 }
-.notification-item small {
+.notification-left .text small {
+  display:block;
   font-size:11px;
   color:#ccc;
 }
+.notification-actions button {
+  margin-left:6px;
+  padding:6px 10px;
+  font-size:12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.follow-btn { background:#00c853; color:#fff; }
+.view-btn { background:#4285F4; color:#fff; }
+.dismiss-btn { background:#555; color:#fff; }
+.notification-actions button:hover { opacity:0.85; }
 </style>
 </head>
 <body>
@@ -74,8 +95,8 @@ header h1 {
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const SUPABASE_URL="https://uyuofjiiptnbbcuntbfi.supabase.co";
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
+const SUPABASE_URL = "https://uyuofjiiptnbbcuntbfi.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function loadNotifications() {
@@ -115,27 +136,77 @@ async function loadNotifications() {
 
   data.forEach(n => {
     let text = '';
+    let actions = '';
+
     switch(n.type){
       case 'new_follower':
         text = `<strong>${n.actor.display_name}</strong> (@${n.actor.username}) followed you`;
+        actions = `<button class="follow-btn" onclick="followBack('${n.actor_id}')">Follow Back</button>
+                   <button class="view-btn" onclick="viewAccount('${n.actor_id}')">View Account</button>`;
         break;
+
       case 'video_liked':
         text = `<strong>${n.actor.display_name}</strong> liked your video`;
+        actions = `<button class="view-btn" onclick="viewVideo('${n.video_id}')">View Video</button>`;
         break;
+
       case 'video_commented':
         text = `<strong>${n.actor.display_name}</strong> commented on your video`;
+        actions = `<button class="view-btn" onclick="viewVideo('${n.video_id}')">View Comment</button>`;
         break;
+
+      case 'system':
+        text = n.message || 'System notification';
+        actions = `<button class="view-btn" onclick="goToAction('${n.id}')">Take Action</button>`;
+        break;
+
       default:
         text = n.message || 'You have a new notification';
     }
 
-    container.innerHTML += `
-      <div class="notification-item">
-        <img src="${n.actor.avatar_url || 'https://via.placeholder.com/40'}" alt="Avatar">
-        <span>${text}</span>
-        <small>${new Date(n.created_at).toLocaleString()}</small>
-      </div>`;
+    const div = document.createElement('div');
+    div.className = 'notification-item';
+    div.innerHTML = `
+      <div class="notification-left">
+        <img src="${n.actor?.avatar_url || 'https://via.placeholder.com/40'}" alt="Avatar">
+        <div class="text">
+          ${text}
+          <small>${new Date(n.created_at).toLocaleString()}</small>
+        </div>
+      </div>
+      <div class="notification-actions">
+        ${actions}
+        <button class="dismiss-btn" onclick="dismissNotification('${n.id}', this)">Dismiss</button>
+      </div>
+    `;
+    container.appendChild(div);
   });
+}
+
+// Action handlers
+async function dismissNotification(id, btn) {
+  await supabase.from('notifications').update({ read:true }).eq('id', id);
+  btn.closest('.notification-item').remove();
+}
+
+async function followBack(actorId){
+  const { data: { user } } = await supabase.auth.getUser();
+  if(!user) return;
+  await supabase.from('followers').insert({ user_id: actorId, follower_id: user.id });
+  alert('Followed back!');
+}
+
+function viewAccount(actorId){
+  location.href = `account.html?user=${actorId}`;
+}
+
+function viewVideo(videoId){
+  location.href = `watch.html?video=${videoId}`;
+}
+
+function goToAction(notificationId){
+  // Example: you can redirect to relevant page based on notification
+  alert('Redirect to action for notification '+notificationId);
 }
 
 // Load notifications on page load
