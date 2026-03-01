@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIGULA – Sign Up</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  window.supabase = createClient(
+    'https://uyuofjiiptnbbcuntbfi.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ'
+  );
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:#121212;color:white;display:flex;justify-content:center;align-items:center;height:100vh;}
@@ -19,9 +25,6 @@ button.disabled{opacity:.5;cursor:not-allowed;}
 .select-method{display:flex;gap:10px;margin-bottom:20px;}
 .select-method button{flex:1;}
 .hidden{display:none;}
-.avatar-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:10px auto;}
-.link{text-align:center;font-size:14px;margin-top:10px;}
-.link a{color:#ff4d4f;text-decoration:none;}
 #message{margin-bottom:12px;text-align:center;padding:10px;border-radius:8px;display:none;}
 #message.error{background:#a00;color:white;}
 #message.success{background:#0a0;color:white;}
@@ -33,32 +36,26 @@ button.disabled{opacity:.5;cursor:not-allowed;}
   <h1>BIGULA Sign Up</h1>
   <div id="message"></div>
 
-  <!-- Step 1: Choose Signup Method -->
   <div id="signup-methods" class="select-method">
-    <button onclick="chooseMethod('google')">Google</button>
+    <button id="google-btn">Google</button>
     <button class="disabled" title="Phone signup disabled">Phone</button>
-    <button onclick="chooseMethod('email')">Email</button>
+    <button id="email-btn">Email</button>
   </div>
 
-  <!-- Step 2: Profile Form -->
-  <div id="profile-form" class="hidden">
-    <img id="avatar-preview" src="https://via.placeholder.com/80" alt="Profile Photo">
-    <input type="file" id="avatar" accept="image/*" />
+  <div id="email-form" class="hidden">
     <input type="text" id="username" placeholder="Username" />
     <input type="text" id="display_name" placeholder="Display Name" />
     <input type="text" id="bio" placeholder="Bio (optional)" />
-    <input type="email" id="email" placeholder="Email" class="hidden"/>
-    <input type="password" id="password" placeholder="Password" class="hidden"/>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
     <button id="signup-btn">Sign Up</button>
-    <div class="link">Already have an account? <a href="login.html">Login</a></div>
+    <div style="text-align:center;margin-top:10px;">
+      Already have an account? <a href="login.html" style="color:#ff4d4f;">Login</a>
+    </div>
   </div>
 </div>
 
 <script type="module">
-const SUPABASE_URL="https://uyuofjiiptnbbcuntbfi.supabase.co";
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const messageBox = document.getElementById('message');
 function showMessage(text, type='error'){
   messageBox.textContent = text;
@@ -66,73 +63,38 @@ function showMessage(text, type='error'){
   messageBox.style.display = 'block';
 }
 
-// Avatar preview
-const avatarInput = document.getElementById("avatar");
-const avatarPreview = document.getElementById("avatar-preview");
-avatarInput.addEventListener("change", e=>{
-  const file = e.target.files[0];
-  if(file) avatarPreview.src = URL.createObjectURL(file);
-});
+document.getElementById('google-btn').onclick = async ()=>{
+  const { error } = await window.supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/home.html' }
+  });
+  if(error) showMessage(error.message, 'error');
+};
 
-let signupMethod = null;
-
-// Choose signup method
-function chooseMethod(method){
-  signupMethod = method;
+document.getElementById('email-btn').onclick = ()=>{
   document.getElementById('signup-methods').classList.add('hidden');
-  document.getElementById('profile-form').classList.remove('hidden');
+  document.getElementById('email-form').classList.remove('hidden');
+};
 
-  if(method === 'google'){
-    supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/home.html' }});
-  }
-  if(method === 'email'){
-    document.getElementById('email').classList.remove('hidden');
-    document.getElementById('password').classList.remove('hidden');
-  }
-}
-
-// Email signup
-document.getElementById('signup-btn').onclick = async function(){
-  messageBox.style.display = 'none';
+document.getElementById('signup-btn').onclick = async ()=>{
+  messageBox.style.display='none';
   const username = document.getElementById("username").value.trim();
   const display_name = document.getElementById("display_name").value.trim();
   const bio = document.getElementById("bio").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  const avatarFile = avatarInput.files[0];
+  if(!username || !display_name || !email || !password) return showMessage("Fill all fields", 'error');
 
-  if(!username || !display_name || !email || !password){
-    return showMessage("Please fill all required fields", 'error');
-  }
-
-  // Sign up via email
-  const { data: userData, error } = await supabase.auth.signUp({
-    email,
-    password,
+  const { data: userData, error } = await window.supabase.auth.signUp({
+    email, password,
     options: { data: { username, display_name, bio } }
   });
   if(error) return showMessage(error.message, 'error');
 
-  const userId = userData.user.id;
-
-  // Upload avatar
-  let avatar_url = "";
-  if(avatarFile){
-    const { data: avatarData, error: avatarError } = await supabase.storage
-      .from('avatars')
-      .upload('public/' + userId + '-' + avatarFile.name, avatarFile, { upsert:true });
-    if(!avatarError) avatar_url = SUPABASE_URL + "/storage/v1/object/public/avatars/" + avatarData.path;
-  }
-
-  // Insert into users table
-  const { error: profileError } = await supabase
-    .from('users')
-    .insert([{ id: userId, username, display_name, bio, avatar_url }]);
-  if(profileError) return showMessage(profileError.message, 'error');
-
   showMessage("Signup successful! Redirecting...", 'success');
-  setTimeout(()=>window.location.href="home.html", 1500);
-}
+  setTimeout(()=>window.location.href='home.html', 1500);
+};
 </script>
+
 </body>
 </html>
