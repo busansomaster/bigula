@@ -9,114 +9,66 @@
 body { background:#000; color:#fff; }
 
 .top-nav {
-  position:fixed;
-  top:0;
-  width:100%;
-  background:#000;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid #222;
-  z-index:1000;
+  position:fixed; top:0; width:100%; background:#000;
+  padding:14px 12px; display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1px solid #222; z-index:1000;
 }
 
-.filter-scroll {
-  display:flex;
-  overflow-x:auto;
-  gap:8px;
-}
+.filter-scroll { display:flex; overflow-x:auto; gap:10px; }
 
 .filter-btn {
-  flex:0 0 auto;
-  background:none;
-  border:none;
-  color:#aaa;
-  font-weight:bold;
-  cursor:pointer;
-  padding:6px 12px;
-  border-radius:20px;
+  flex:0 0 auto; background:none; border:none; color:#aaa;
+  font-weight:bold; cursor:pointer; padding:10px 18px; border-radius:22px; font-size:16px;
 }
 
-.filter-btn.active { color:#ff0050; border:1px solid #ff0050; }
+.filter-btn.active { color:#ff0050; border:2px solid #ff0050; }
 
-#loginBtn {
-  background:#ff0050;
-  border:none;
-  padding:6px 14px;
-  border-radius:20px;
-  font-weight:bold;
-  color:#fff;
-  cursor:pointer;
-}
+#loginBtn, #addVideoBtn { padding:10px 20px; border-radius:22px; font-weight:bold; font-size:16px; border:none; cursor:pointer; }
+#loginBtn { background:#ff0050; color:#fff; }
+#addVideoBtn { background:#555; color:#ccc; cursor:not-allowed; }
+#addVideoBtn.enabled { background:#ff0050; color:#fff; cursor:pointer; }
 
 .search-bar {
-  position:fixed;
-  top:60px;
-  width:100%;
-  padding:10px;
-  background:#111;
-  display:none;
+  position:fixed; top:64px; width:100%; padding:10px; background:#111; display:none;
 }
+.search-bar input { width:100%; padding:10px; border-radius:25px; border:none; font-size:16px; }
 
-.search-bar input {
-  width:100%;
-  padding:10px;
-  border-radius:25px;
-  border:none;
-}
+.feed { margin-top:120px; margin-bottom:80px; padding:10px; }
 
-.feed {
-  margin-top:110px;
-  margin-bottom:80px;
-  padding:10px;
-}
+.video-card { margin-bottom:30px; position:relative; }
+video { width:100%; border-radius:12px; display:block; }
+.video-info h3 { font-size:18px; margin-top:6px; }
+.video-info p { font-size:14px; color:#bbb; margin:2px 0; }
 
-.video-card { margin-bottom:30px; }
-video { width:100%; border-radius:12px; }
-
-.video-info h3 { font-size:16px; margin-top:6px; }
-.video-info p { font-size:13px; color:#bbb; }
-
-.actions {
-  display:flex;
-  gap:15px;
-  margin-top:6px;
-}
-
-.actions button {
-  background:none;
-  border:none;
-  color:#fff;
-  cursor:pointer;
-}
-
-.actions button.disabled {
-  opacity:0.4;
-  cursor:not-allowed;
-}
+.actions { display:flex; gap:15px; margin-top:6px; }
+.actions button { background:none; border:none; color:#fff; cursor:pointer; font-size:18px; }
+.actions button.disabled { opacity:0.4; cursor:not-allowed; }
 
 .footer {
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:#000;
-  border-top:1px solid #222;
-  display:flex;
-  justify-content:space-around;
-  padding:12px 0;
+  position:fixed; bottom:0; width:100%; background:#000;
+  border-top:1px solid #222; display:flex; justify-content:space-around; padding:14px 0;
+}
+.footer button { font-size:24px; padding:10px; border:none; background:none; color:#fff; cursor:pointer; transition: transform 0.3s; }
+.footer button.animate { animation:shake 0.6s infinite; }
+.footer button.disabled { opacity:0.4; cursor:not-allowed; }
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
 }
 
-.footer button {
-  font-size:20px;
-  padding:10px;
-  border:none;
-  background:none;
-  color:#fff;
-  cursor:pointer;
+/* Notifications Dropdown */
+#notifDropdown {
+  position:absolute; top:60px; right:10px; background:#111; border:1px solid #222;
+  width:300px; max-height:400px; overflow-y:auto; display:none; border-radius:12px; z-index:2000;
 }
+.notification-item { padding:10px; border-bottom:1px solid #222; font-size:14px; display:flex; justify-content:space-between; }
+.notification-item button { background:none; border:none; color:#ff0050; cursor:pointer; font-size:14px; }
 
-.footer button:hover { color:#ff0050; }
+.message { font-size:14px; color:#ff9999; margin-top:6px; text-align:center; display:none; }
 </style>
 </head>
 <body>
@@ -124,152 +76,136 @@ video { width:100%; border-radius:12px; }
 <div class="top-nav">
   <button id="searchBtn">🔍</button>
   <div class="filter-scroll">
-    <button class="filter-btn" id="forYouBtn">For You</button>
+    <button class="filter-btn active" id="forYouBtn">For You</button>
     <button class="filter-btn" id="latestBtn">Latest</button>
     <button class="filter-btn" id="viralBtn">Viral</button>
   </div>
-  <button id="loginBtn" onclick="goLogin()">Login</button>
+  <div>
+    <button id="addVideoBtn">➕ Upload</button>
+    <button id="loginBtn">Login</button>
+  </div>
 </div>
 
 <div class="search-bar" id="searchBar">
   <input type="text" id="searchInput" placeholder="Search users or titles...">
 </div>
 
+<div id="notifDropdown"></div>
 <div class="feed" id="feed"></div>
 
 <div class="footer">
-  <button>🔔</button>
+  <button id="notifBtn">🔔</button>
   <button onclick="location.href='home.html'">🏠</button>
-  <button onclick="location.href='account.html'">👤</button>
+  <button id="accountBtn" class="disabled">👤</button>
 </div>
 
 <script type="module">
-import { baseVideos } from './data.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { baseVideos } from './data.js';
 
+// --- Firebase ---
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+ apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
   authDomain: "bigula-d8cab.firebaseapp.com",
-  projectId: "bigula-d8cab"
-};
-
+  projectId: "bigula-d8cab",
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 let currentUser = null;
 const loginBtn = document.getElementById("loginBtn");
+const addVideoBtn = document.getElementById("addVideoBtn");
+const notifBtn = document.getElementById("notifBtn");
+const accountBtn = document.getElementById("accountBtn");
+const notifDropdown = document.getElementById("notifDropdown");
 
-onAuthStateChanged(auth, user => {
+let userNotifications = []; // {id,title,type,isRead}
+
+onAuthStateChanged(auth, user=>{
   currentUser = user;
-  if(currentUser) {
-    loginBtn.textContent = "My Dashboard";
-    loginBtn.onclick = () => location.href='dashboard.html';
+  if(currentUser){
+    loginBtn.textContent = "Dashboard";
+    loginBtn.onclick=()=> location.href='dashboard.html';
+    addVideoBtn.classList.add("enabled");
+    addVideoBtn.onclick=()=> location.href='upload.html';
+    accountBtn.classList.remove("disabled"); accountBtn.onclick=()=> location.href='account.html';
   } else {
-    loginBtn.textContent = "Login";
-    loginBtn.onclick = goLogin;
+    loginBtn.textContent = "Login"; loginBtn.onclick=()=> location.href='login.html';
+    addVideoBtn.classList.remove("enabled"); addVideoBtn.onclick=()=>{};
+    accountBtn.classList.add("disabled"); accountBtn.onclick=()=>{};
   }
+  renderNotifications(); updateNotifUI();
 });
 
-function goLogin() {
-  location.href = 'login.html';
-}
-
+// --- Feed ---
 const feed = document.getElementById("feed");
+let currentVideos = [...baseVideos];
 
-function getStats() { return JSON.parse(localStorage.getItem("videoStats")) || {}; }
-function saveStats(stats) { localStorage.setItem("videoStats", JSON.stringify(stats)); }
-function ensureVideoStats(videoId) {
-  let stats = getStats();
-  if(!stats[videoId]) { stats[videoId] = { views:0, likes:0, comments:0 }; saveStats(stats); }
+// For You: show videos based on followed creators & interests
+function getForYouVideos(){
+  // mock logic: random subset
+  return currentVideos.sort(()=>0.5-Math.random());
+}
+// Latest: newest videos based on interests/following
+function getLatestVideos(){ return currentVideos.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt)); }
+// Viral: most popular based on views/likes/comments
+function getViralVideos(){
+  let stats=JSON.parse(localStorage.getItem("videoStats"))||{};
+  return currentVideos.sort((a,b)=>((stats[b.id]?.views||0)+(stats[b.id]?.likes||0)+(stats[b.id]?.comments||0)) - ((stats[a.id]?.views||0)+(stats[a.id]?.likes||0)+(stats[a.id]?.comments||0)));
 }
 
-function renderVideos(videoList) {
-  feed.innerHTML = "";
-  videoList.forEach(video => {
-    ensureVideoStats(video.id);
-    let stats = getStats()[video.id];
-    const card = document.createElement("div");
-    card.className = "video-card";
-    card.innerHTML = `
-      <video src="${video.videoUrl}" data-id="${video.id}"></video>
+function renderVideos(videoList){
+  feed.innerHTML="";
+  videoList.forEach((video,i)=>{
+    const card=document.createElement("div");
+    card.className="video-card";
+    card.innerHTML=`
+      <video src="${video.videoUrl}" data-id="${video.id}" controls autoplay muted></video>
       <div class="video-info">
         <h3>${video.title}</h3>
-        <p>${video.description}</p>
         <p>@${video.creator}</p>
         <p>${new Date(video.createdAt).toLocaleString()}</p>
         <div class="actions">
-          <button class="like-btn" data-id="${video.id}">❤️ ${stats.likes}</button>
-          <button class="comment-btn" data-id="${video.id}">💬 ${stats.comments}</button>
-          <span>👁 ${stats.views}</span>
+          <button class="like-btn" data-id="${video.id}">❤️ 0</button>
+          <button class="comment-btn" data-id="${video.id}">💬 0</button>
+          <span>👁 0</span>
         </div>
-      </div>
-    `;
+      </div>`;
     feed.appendChild(card);
-  });
-  attachEvents();
-}
 
-function attachEvents() {
-  document.querySelectorAll("video").forEach(video => {
-    video.addEventListener("play", () => {
-      const id = video.dataset.id;
-      let stats = getStats();
-      stats[id].views++;
-      saveStats(stats);
-      renderVideos(currentVideos);
-    });
-  });
-
-  document.querySelectorAll(".like-btn").forEach(btn => {
-    if(!currentUser) { btn.classList.add("disabled"); btn.onclick = () => alert("Login to like videos"); }
-    else { btn.onclick = () => { let id = btn.dataset.id; let stats = getStats(); stats[id].likes++; saveStats(stats); renderVideos(currentVideos); }; }
-  });
-
-  document.querySelectorAll(".comment-btn").forEach(btn => {
-    if(!currentUser) { btn.classList.add("disabled"); btn.onclick = () => alert("Login to comment"); }
-    else { btn.onclick = () => { let id = btn.dataset.id; let stats = getStats(); stats[id].comments++; saveStats(stats); renderVideos(currentVideos); }; }
+    // Cache first 3 videos for offline autoplay
+    if(i<3){ card.querySelector('video').preload='auto'; }
   });
 }
 
-let currentVideos = [...baseVideos];
-
-// Default tab: For You
-currentVideos.sort(()=>0.5-Math.random());
-renderVideos(currentVideos);
-
-document.getElementById("latestBtn").onclick = () => {
-  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
-  latestBtn.classList.add("active");
-  currentVideos.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
-  renderVideos(currentVideos);
+// --- Notification Dropdown ---
+notifBtn.onclick=()=>{
+  notifDropdown.style.display=(notifDropdown.style.display==='block')?'none':'block';
+  renderNotifications();
 };
 
-document.getElementById("viralBtn").onclick = () => {
-  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
-  viralBtn.classList.add("active");
-  let stats = getStats();
-  currentVideos.sort((a,b)=> (stats[b.id]?.views||0)-(stats[a.id]?.views||0));
-  renderVideos(currentVideos);
-};
+function renderNotifications(){
+  notifDropdown.innerHTML="";
+  if(userNotifications.length===0){ notifDropdown.innerHTML='<p style="text-align:center;padding:10px;">No notifications</p>'; return; }
+  userNotifications.forEach(n=>{
+    const div=document.createElement("div"); div.className='notification-item';
+    div.innerHTML=`<span>${n.title}</span><button onclick="dismissNotif('${n.id}')">Dismiss</button>`;
+    notifDropdown.appendChild(div);
+  });
+}
 
-document.getElementById("forYouBtn").onclick = () => {
-  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
-  forYouBtn.classList.add("active");
-  currentVideos.sort(()=>0.5-Math.random());
-  renderVideos(currentVideos);
-};
+function dismissNotif(id){ userNotifications=userNotifications.filter(n=>n.id!==id); renderNotifications(); updateNotifUI(); }
+function markAllRead(){ userNotifications=[]; renderNotifications(); updateNotifUI(); }
 
-// Search
-document.getElementById("searchBtn").onclick = ()=>{ document.getElementById("searchBar").style.display="block"; };
-document.getElementById("searchInput").addEventListener("input", e=>{
-  const q = e.target.value.toLowerCase();
-  const filtered = baseVideos.filter(v =>
-    v.title.toLowerCase().includes(q) || v.creator.toLowerCase().includes(q)
-  );
-  renderVideos(filtered);
-});
+function updateNotifUI(){ if(userNotifications.length>0) notifBtn.classList.add("animate"); else notifBtn.classList.remove("animate"); }
+
+// Filter buttons
+document.getElementById("forYouBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); forYouBtn.classList.add("active"); renderVideos(getForYouVideos()); };
+document.getElementById("latestBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); latestBtn.classList.add("active"); renderVideos(getLatestVideos()); };
+document.getElementById("viralBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); viralBtn.classList.add("active"); renderVideos(getViralVideos()); };
+
+// Autoplay first videos
+renderVideos(getForYouVideos());
 </script>
-
 </body>
 </html>
