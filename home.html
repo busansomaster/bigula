@@ -92,17 +92,17 @@ video{width:100%;height:100%;object-fit:cover;}
 
 <script>
 /* CONFIG */
-const SUPABASE_URL="YOUR_SUPABASE_URL";
-const SUPABASE_KEY="YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL="https://uyuofjiiptnbbcuntbfi.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 /* FIREBASE INIT */
 const { initializeApp, getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc } = window.firebaseModules;
 
-const firebaseConfig={
-  apiKey:"YOUR_KEY",
-  authDomain:"YOUR_DOMAIN",
-  projectId:"YOUR_PROJECT_ID"
+const firebaseConfig = {
+ apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
+  authDomain: "bigula-d8cab.firebaseapp.com",
+  projectId: "bigula-d8cab",
 };
 
 const app=initializeApp(firebaseConfig);
