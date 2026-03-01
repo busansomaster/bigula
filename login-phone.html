@@ -1,69 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Phone Login - BIGULA</title>
+<title>BIGULA – Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const supabase = createClient(
-  "https://uyuofjiiptnbbcuntbfi.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ"
-)
-
-window.sendOTP = async () => {
-  const phone = phoneInput.value
-
-  const { error } = await supabase.auth.signInWithOtp({ phone })
-  if (error) return show(error.message)
-
-  otpSection.style.display = "block"
-}
-
-window.verifyOTP = async () => {
-  const phone = phoneInput.value
-  const token = otpInput.value
-
-  const { error } = await supabase.auth.verifyOtp({
-    phone,
-    token,
-    type: 'sms'
-  })
-
-  if (error) return show(error.message)
-
-  window.location.href = "home.html"
-}
-
-function show(msg){
-  message.innerText = msg
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { background:#121212; color:white; display:flex; justify-content:center; align-items:center; height:100vh; }
-.box { background:#1f1f1f; padding:30px; border-radius:10px; width:320px; text-align:center; }
-input,button { width:100%; padding:10px; margin:8px 0; border:none; border-radius:5px; }
-button { background:#ff4d4f; color:white; cursor:pointer; }
-#otpSection { display:none; }
-#message { color:#ff4d4f; font-size:14px; }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#111,#1e1e2f);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:white;
+}
+
+.container{
+  width:100%;
+  max-width:400px;
+  background:#1a1a2e;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+
+h1{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  margin-bottom:15px;
+  border:none;
+  border-radius:8px;
+  background:#2a2a40;
+  color:white;
+  font-size:15px;
+}
+
+input:focus{
+  outline:none;
+  border:1px solid #6c5ce7;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:8px;
+  background:#6c5ce7;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  background:#574bce;
+}
+
+.link{
+  text-align:center;
+  margin-top:15px;
+  font-size:14px;
+}
+
+.link a{
+  color:#6c5ce7;
+  text-decoration:none;
+}
 </style>
 </head>
 
 <body>
-<div class="box">
-<h2>Phone Login</h2>
-<input id="phoneInput" placeholder="+2567XXXXXXXX">
-<button onclick="sendOTP()">Send OTP</button>
 
-<div id="otpSection">
-<input id="otpInput" placeholder="Enter OTP">
-<button onclick="verifyOTP()">Verify</button>
+<div class="container">
+  <h1>BIGULA Login</h1>
+
+  <input type="text" id="phone" placeholder="Phone Number (+256...)" />
+  <input type="password" id="password" placeholder="Password" />
+
+  <button onclick="loginUser()">Login</button>
+
+  <div class="link">
+    Don’t have an account? <a href="signup.html">Create Account</a>
+  </div>
 </div>
 
-<div id="message"></div>
-<a href="login.html" style="color:#ff4d4f">Back</a>
-</div>
+<script>
+const supabase = window.supabase.createClient(
+  "https://uyuofjiiptnbbcuntbfi.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ"
+);
+
+async function loginUser() {
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if(!phone || !password){
+    alert("Enter phone and password");
+    return;
+  }
+
+  const emailAlias = phone + "@bigula.app";
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: emailAlias,
+    password: password
+  });
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  window.location.href = "home.html";
+}
+</script>
+
 </body>
 </html>
