@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIGULA – Notifications</title>
+<style>
+body {
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:#121212;
+  color:#fff;
+}
+header {
+  background:#1a1a1a;
+  padding:15px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+header h1 {
+  color:#ff4d4f;
+  font-size:1.6rem;
+}
+.container {
+  width:95%;
+  max-width:600px;
+  margin:20px auto;
+  background:#1f1f2f;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+.notification-item {
+  display:flex;
+  align-items:center;
+  background:#2a2a3a;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
+  gap:10px;
+  transition:0.2s;
+}
+.notification-item:hover {
+  background:#ff4d4f;
+  color:#fff;
+}
+.notification-item img {
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.notification-item span {
+  flex:1;
+}
+.notification-item small {
+  font-size:11px;
+  color:#ccc;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Notifications</h1>
+  <button onclick="location.href='dashboard.html'" style="background:#ff4d4f;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;">Back</button>
+</header>
+
+<div class="container" id="notificationsContainer">
+  Loading notifications...
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const SUPABASE_URL="https://uyuofjiiptnbbcuntbfi.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadNotifications() {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if(userError || !user){
+    document.getElementById('notificationsContainer').innerHTML = '<p>Please login to see notifications.</p>';
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('notifications')
+    .select(`
+      id,
+      type,
+      message,
+      actor_id,
+      actor:users(username, display_name, avatar_url),
+      video_id,
+      created_at,
+      read
+    `)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if(error){
+    console.error(error);
+    document.getElementById('notificationsContainer').innerHTML = '<p>Error loading notifications.</p>';
+    return;
+  }
+
+  const container = document.getElementById('notificationsContainer');
+  container.innerHTML = '';
+  if(data.length === 0){
+    container.innerHTML = '<p>No notifications yet.</p>';
+    return;
+  }
+
+  data.forEach(n => {
+    let text = '';
+    switch(n.type){
+      case 'new_follower':
+        text = `<strong>${n.actor.display_name}</strong> (@${n.actor.username}) followed you`;
+        break;
+      case 'video_liked':
+        text = `<strong>${n.actor.display_name}</strong> liked your video`;
+        break;
+      case 'video_commented':
+        text = `<strong>${n.actor.display_name}</strong> commented on your video`;
+        break;
+      default:
+        text = n.message || 'You have a new notification';
+    }
+
+    container.innerHTML += `
+      <div class="notification-item">
+        <img src="${n.actor.avatar_url || 'https://via.placeholder.com/40'}" alt="Avatar">
+        <span>${text}</span>
+        <small>${new Date(n.created_at).toLocaleString()}</small>
+      </div>`;
+  });
+}
+
+// Load notifications on page load
+loadNotifications();
+</script>
+
+</body>
+</html>
