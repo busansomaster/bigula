@@ -3,119 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BIGULA Splash</title>
-<style>
-  /* Full-screen splash */
-  body, html { margin:0; padding:0; width:100%; height:100%; font-family:Arial,sans-serif; background:#121212; color:#fff; }
-  #splash { display:flex; justify-content:center; align-items:center; height:100%; flex-direction:column; transition:opacity 1s; }
-  #splash h1 { font-size:2rem; color:#ff4d4f; animation: bounce 1.5s infinite; }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
+<title>BIGULA – Welcome</title>
 
-  /* Overlay */
-  #overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
-  .overlay-step { display:none; text-align:center; }
-  .overlay-step.active { display:block; }
-  .overlay-step h2 { color:#ff4d4f; margin-bottom:15px; }
-  .overlay-step p { font-size:16px; margin-bottom:20px; }
-  .overlay-buttons { display:flex; gap:10px; justify-content:center; }
-  .overlay-buttons button { padding:10px 20px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; }
-  .next-btn { background:#ff4d4f; color:#fff; }
-  .skip-btn { background:#555; color:#fff; }
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f0f0f,#1a1a2e,#16213e);
+  overflow:hidden;
+  color:white;
+}
+
+/* Center Text */
+.splash{
+  text-align:center;
+  z-index:2;
+  animation: fadeIn 1.5s ease forwards;
+}
+
+.splash h2{
+  font-weight:300;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  opacity:0.8;
+}
+
+.splash h1{
+  font-size:60px;
+  margin:10px 0;
+  background:linear-gradient(45deg,#00f5ff,#ff00c8);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-weight:800;
+  letter-spacing:5px;
+}
+
+.splash p{
+  font-size:18px;
+  letter-spacing:2px;
+  opacity:0.7;
+}
+
+/* Floating Shapes */
+.floating{
+  position:absolute;
+  width:100%;
+  height:100%;
+  top:0;
+  left:0;
+  overflow:hidden;
+  z-index:1;
+}
+
+.floating span{
+  position:absolute;
+  display:block;
+  width:25px;
+  height:25px;
+  background:rgba(255,255,255,0.1);
+  animation: float 20s linear infinite;
+  border-radius:50%;
+}
+
+/* Random positions */
+.floating span:nth-child(1){ left:10%; animation-duration:18s; }
+.floating span:nth-child(2){ left:25%; animation-duration:22s; width:40px; height:40px;}
+.floating span:nth-child(3){ left:40%; animation-duration:16s;}
+.floating span:nth-child(4){ left:55%; animation-duration:25s; width:35px; height:35px;}
+.floating span:nth-child(5){ left:70%; animation-duration:19s;}
+.floating span:nth-child(6){ left:85%; animation-duration:23s; width:30px; height:30px;}
+
+@keyframes float{
+  0%{
+    transform:translateY(100vh) rotate(0deg);
+    opacity:0;
+  }
+  10%{opacity:1;}
+  90%{opacity:1;}
+  100%{
+    transform:translateY(-10vh) rotate(360deg);
+    opacity:0;
+  }
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* Responsive */
+@media(max-width:600px){
+  .splash h1{font-size:40px;}
+}
 </style>
 </head>
+
 <body>
 
-<!-- Splash Screen -->
-<div id="splash">
-  <h1>Welcome to BIGULA</h1>
+<div class="floating">
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
 </div>
 
-<!-- Onboarding Overlay -->
-<div id="overlay">
-  <div class="overlay-step active">
-    <h2>Discover Amazing Content</h2>
-    <p>Watch trending videos and discover creators from all over the world.</p>
-  </div>
-  <div class="overlay-step">
-    <h2>Upload Your Own Videos</h2>
-    <p>Share your creativity and connect with fans easily.</p>
-  </div>
-  <div class="overlay-step">
-    <h2>Make money from your content</h2>
-    <p>Monetize your videos through ads and grow your audience.</p>
-  </div>
-  <div class="overlay-buttons">
-    <button class="skip-btn" onclick="skipOverlay()">Skip</button>
-    <button class="next-btn" onclick="nextStep()">Next</button>
-  </div>
+<div class="splash">
+  <h2>welcome to</h2>
+  <h1>BIGULA</h1>
+  <p>your stressfree home</p>
 </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.34.0/firebase-storage-compat.js"></script>
 <script>
-  // TODO: Replace with your Firebase config
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "bigula-d8cab.firebaseapp.com",
-    projectId: "bigula-d8cab",
-    storageBucket: "bigula-d8cab.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  const storage = firebase.storage();
-</script>
+// Wait 4 seconds before checking
+setTimeout(function(){
 
-<script>
-const splash = document.getElementById('splash');
-const overlay = document.getElementById('overlay');
-const steps = document.querySelectorAll('.overlay-step');
-let currentStep = 0;
+  const interests = localStorage.getItem("userInterests");
 
-// Check if user has visited before
-const firstVisit = localStorage.getItem('bigula_first_visit');
-
-function showOverlay() {
-  splash.style.opacity = 0;
-  setTimeout(() => {
-    splash.style.display = 'none';
-    overlay.style.display = 'flex';
-  }, 1000);
-}
-
-// Only show onboarding if first visit
-if(!firstVisit) {
-  setTimeout(showOverlay, 2000);
-  localStorage.setItem('bigula_first_visit', 'true');
-} else {
-  // Skip overlay, show splash briefly then redirect
-  setTimeout(() => {
-    splash.style.opacity = 0;
-    setTimeout(() => window.location.href = 'home.html', 1000);
-  }, 2000);
-}
-
-function nextStep() {
-  steps[currentStep].classList.remove('active');
-  currentStep++;
-  if(currentStep >= steps.length) {
-    window.location.href = 'home.html';
-    return;
+  if(!interests){
+    // First time user
+    window.location.href = "interests.html";
+  } else {
+    // Returning user
+    window.location.href = "home.html";
   }
-  steps[currentStep].classList.add('active');
-}
 
-function skipOverlay() {
-  window.location.href = 'home.html';
-}
+}, 4000);
 </script>
 
 </body>
