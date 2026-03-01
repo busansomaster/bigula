@@ -6,69 +6,64 @@
 <title>BIGULA</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
-body { background:#000; color:#fff; }
+body { background:#000; color:#fff; overflow-x:hidden; }
 
 .top-nav {
   position:fixed; top:0; width:100%; background:#000;
-  padding:14px 12px; display:flex; justify-content:space-between; align-items:center;
+  padding:14px 10px; display:flex; justify-content:space-between; align-items:center;
   border-bottom:1px solid #222; z-index:1000;
+  flex-wrap:wrap;
 }
 
-.filter-scroll { display:flex; overflow-x:auto; gap:10px; }
+.filter-scroll {
+  display:flex; overflow-x:auto; gap:8px; margin:5px 0;
+}
 
 .filter-btn {
   flex:0 0 auto; background:none; border:none; color:#aaa;
-  font-weight:bold; cursor:pointer; padding:10px 18px; border-radius:22px; font-size:16px;
+  font-weight:bold; cursor:pointer; padding:8px 16px; border-radius:20px; font-size:16px;
+  white-space:nowrap;
 }
-
 .filter-btn.active { color:#ff0050; border:2px solid #ff0050; }
 
-#loginBtn, #addVideoBtn { padding:10px 20px; border-radius:22px; font-weight:bold; font-size:16px; border:none; cursor:pointer; }
+#loginBtn, #addVideoBtn {
+  padding:8px 18px; border-radius:20px; font-weight:bold; font-size:16px; border:none; cursor:pointer; margin-left:5px;
+}
 #loginBtn { background:#ff0050; color:#fff; }
 #addVideoBtn { background:#555; color:#ccc; cursor:not-allowed; }
 #addVideoBtn.enabled { background:#ff0050; color:#fff; cursor:pointer; }
 
 .search-bar {
-  position:fixed; top:64px; width:100%; padding:10px; background:#111; display:none;
+  position:fixed; top:70px; width:100%; padding:10px; background:#111; display:none;
 }
 .search-bar input { width:100%; padding:10px; border-radius:25px; border:none; font-size:16px; }
 
-.feed { margin-top:120px; margin-bottom:80px; padding:10px; }
+.feed {
+  margin-top:110px; margin-bottom:60px; padding:0; display:flex; flex-direction:column;
+  scroll-snap-type: y mandatory; overflow-y:auto; height:calc(100vh - 110px);
+}
 
-.video-card { margin-bottom:30px; position:relative; }
-video { width:100%; border-radius:12px; display:block; }
-.video-info h3 { font-size:18px; margin-top:6px; }
-.video-info p { font-size:14px; color:#bbb; margin:2px 0; }
+.video-card { margin-bottom:0; position:relative; scroll-snap-align:start; height:100vh; display:flex; flex-direction:column; justify-content:center; }
+video { width:100%; height:100%; object-fit:cover; border-radius:0; display:block; }
 
-.actions { display:flex; gap:15px; margin-top:6px; }
+.video-info {
+  position:absolute; bottom:80px; left:10px; color:#fff; z-index:10; width:95%;
+  background: rgba(0,0,0,0.3); padding:8px; border-radius:10px;
+}
+.video-info h3 { font-size:20px; margin-bottom:4px; }
+.video-info p { font-size:14px; color:#ccc; margin:2px 0; }
+.actions { display:flex; gap:15px; margin-top:4px; }
 .actions button { background:none; border:none; color:#fff; cursor:pointer; font-size:18px; }
 .actions button.disabled { opacity:0.4; cursor:not-allowed; }
 
 .footer {
   position:fixed; bottom:0; width:100%; background:#000;
-  border-top:1px solid #222; display:flex; justify-content:space-around; padding:14px 0;
+  border-top:1px solid #222; display:flex; justify-content:space-around; padding:10px 0;
 }
-.footer button { font-size:24px; padding:10px; border:none; background:none; color:#fff; cursor:pointer; transition: transform 0.3s; }
-.footer button.animate { animation:shake 0.6s infinite; }
+.footer button { font-size:24px; padding:10px; border:none; background:none; color:#fff; cursor:pointer; }
 .footer button.disabled { opacity:0.4; cursor:not-allowed; }
 
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  50% { transform: translateX(3px); }
-  75% { transform: translateX(-3px); }
-  100% { transform: translateX(0); }
-}
-
-/* Notifications Dropdown */
-#notifDropdown {
-  position:absolute; top:60px; right:10px; background:#111; border:1px solid #222;
-  width:300px; max-height:400px; overflow-y:auto; display:none; border-radius:12px; z-index:2000;
-}
-.notification-item { padding:10px; border-bottom:1px solid #222; font-size:14px; display:flex; justify-content:space-between; }
-.notification-item button { background:none; border:none; color:#ff0050; cursor:pointer; font-size:14px; }
-
-.message { font-size:14px; color:#ff9999; margin-top:6px; text-align:center; display:none; }
+.message { font-size:14px; color:#ff9999; text-align:center; display:none; }
 </style>
 </head>
 <body>
@@ -90,7 +85,6 @@ video { width:100%; border-radius:12px; display:block; }
   <input type="text" id="searchInput" placeholder="Search users or titles...">
 </div>
 
-<div id="notifDropdown"></div>
 <div class="feed" id="feed"></div>
 
 <div class="footer">
@@ -104,12 +98,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { baseVideos } from './data.js';
 
-// --- Firebase ---
 const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
+  apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
   authDomain: "bigula-d8cab.firebaseapp.com",
   projectId: "bigula-d8cab"
-  };
+};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -118,95 +111,77 @@ const loginBtn = document.getElementById("loginBtn");
 const addVideoBtn = document.getElementById("addVideoBtn");
 const notifBtn = document.getElementById("notifBtn");
 const accountBtn = document.getElementById("accountBtn");
-const notifDropdown = document.getElementById("notifDropdown");
+const feed = document.getElementById("feed");
 
-let userNotifications = []; // {id,title,type,isRead}
-
-onAuthStateChanged(auth, user=>{
+// --- Login / Button States ---
+onAuthStateChanged(auth, user => {
   currentUser = user;
   if(currentUser){
-    loginBtn.textContent = "Dashboard";
-    loginBtn.onclick=()=> location.href='dashboard.html';
-    addVideoBtn.classList.add("enabled");
-    addVideoBtn.onclick=()=> location.href='upload.html';
+    loginBtn.textContent="Dashboard"; loginBtn.onclick=()=> location.href='dashboard.html';
+    addVideoBtn.classList.add("enabled"); addVideoBtn.onclick=()=> location.href='upload.html';
     accountBtn.classList.remove("disabled"); accountBtn.onclick=()=> location.href='account.html';
   } else {
-    loginBtn.textContent = "Login"; loginBtn.onclick=()=> location.href='login.html';
+    loginBtn.textContent="Login"; loginBtn.onclick=()=> location.href='login.html';
     addVideoBtn.classList.remove("enabled"); addVideoBtn.onclick=()=>{};
     accountBtn.classList.add("disabled"); accountBtn.onclick=()=>{};
   }
-  renderNotifications(); updateNotifUI();
 });
 
 // --- Feed ---
-const feed = document.getElementById("feed");
 let currentVideos = [...baseVideos];
-
-// For You: show videos based on followed creators & interests
-function getForYouVideos(){
-  // mock logic: random subset
-  return currentVideos.sort(()=>0.5-Math.random());
-}
-// Latest: newest videos based on interests/following
-function getLatestVideos(){ return currentVideos.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt)); }
-// Viral: most popular based on views/likes/comments
-function getViralVideos(){
-  let stats=JSON.parse(localStorage.getItem("videoStats"))||{};
-  return currentVideos.sort((a,b)=>((stats[b.id]?.views||0)+(stats[b.id]?.likes||0)+(stats[b.id]?.comments||0)) - ((stats[a.id]?.views||0)+(stats[a.id]?.likes||0)+(stats[a.id]?.comments||0)));
-}
+let activeVideo = null;
 
 function renderVideos(videoList){
   feed.innerHTML="";
   videoList.forEach((video,i)=>{
-    const card=document.createElement("div");
-    card.className="video-card";
+    const card = document.createElement("div"); card.className="video-card";
     card.innerHTML=`
-      <video src="${video.videoUrl}" data-id="${video.id}" controls autoplay muted></video>
+      <video src="${video.videoUrl}" data-id="${video.id}" muted playsinline></video>
       <div class="video-info">
         <h3>${video.title}</h3>
         <p>@${video.creator}</p>
         <p>${new Date(video.createdAt).toLocaleString()}</p>
-        <div class="actions">
-          <button class="like-btn" data-id="${video.id}">❤️ 0</button>
-          <button class="comment-btn" data-id="${video.id}">💬 0</button>
-          <span>👁 0</span>
-        </div>
       </div>`;
     feed.appendChild(card);
-
-    // Cache first 3 videos for offline autoplay
-    if(i<3){ card.querySelector('video').preload='auto'; }
   });
+  setupAutoplay();
 }
 
-// --- Notification Dropdown ---
-notifBtn.onclick=()=>{
-  notifDropdown.style.display=(notifDropdown.style.display==='block')?'none':'block';
-  renderNotifications();
-};
-
-function renderNotifications(){
-  notifDropdown.innerHTML="";
-  if(userNotifications.length===0){ notifDropdown.innerHTML='<p style="text-align:center;padding:10px;">No notifications</p>'; return; }
-  userNotifications.forEach(n=>{
-    const div=document.createElement("div"); div.className='notification-item';
-    div.innerHTML=`<span>${n.title}</span><button onclick="dismissNotif('${n.id}')">Dismiss</button>`;
-    notifDropdown.appendChild(div);
-  });
+// Autoplay only the video currently in view
+function setupAutoplay(){
+  const videos = document.querySelectorAll("video");
+  function playVisibleVideo(){
+    let found=false;
+    videos.forEach(v=>{
+      const rect=v.getBoundingClientRect();
+      if(rect.top>=0 && rect.bottom <= window.innerHeight){ 
+        if(activeVideo && activeVideo!==v){ activeVideo.pause(); }
+        activeVideo=v; v.play(); found=true;
+      } else { v.pause(); }
+    });
+  }
+  playVisibleVideo();
+  feed.addEventListener("scroll", playVisibleVideo);
 }
 
-function dismissNotif(id){ userNotifications=userNotifications.filter(n=>n.id!==id); renderNotifications(); updateNotifUI(); }
-function markAllRead(){ userNotifications=[]; renderNotifications(); updateNotifUI(); }
+// Filters
+document.getElementById("forYouBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); forYouBtn.classList.add("active"); renderVideos(currentVideos.sort(()=>0.5-Math.random())); };
+document.getElementById("latestBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); latestBtn.classList.add("active"); renderVideos(currentVideos.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt))); };
+document.getElementById("viralBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); viralBtn.classList.add("active"); renderVideos(currentVideos.sort((a,b)=> b.views - a.views)); };
 
-function updateNotifUI(){ if(userNotifications.length>0) notifBtn.classList.add("animate"); else notifBtn.classList.remove("animate"); }
+// Search
+const searchBar = document.getElementById("searchBar");
+document.getElementById("searchBtn").onclick=()=>{ searchBar.style.display = searchBar.style.display==='block'?'none':'block'; };
+document.getElementById("searchInput").addEventListener("input", e=>{
+  const q=e.target.value.toLowerCase();
+  renderVideos(baseVideos.filter(v=>v.title.toLowerCase().includes(q) || v.creator.toLowerCase().includes(q)));
+});
 
-// Filter buttons
-document.getElementById("forYouBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); forYouBtn.classList.add("active"); renderVideos(getForYouVideos()); };
-document.getElementById("latestBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); latestBtn.classList.add("active"); renderVideos(getLatestVideos()); };
-document.getElementById("viralBtn").onclick=()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); viralBtn.classList.add("active"); renderVideos(getViralVideos()); };
+// Notifications button redirects
+notifBtn.onclick=()=>{ location.href='notifications.html'; };
 
-// Autoplay first videos
-renderVideos(getForYouVideos());
+// Initial render
+renderVideos(currentVideos);
 </script>
 </body>
 </html>
