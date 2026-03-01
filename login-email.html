@@ -1,48 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Email Login - BIGULA</title>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+  "https://uyuofjiiptnbbcuntbfi.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ"
+)
+
+window.login = async () => {
+  const email = emailInput.value
+  const password = passwordInput.value
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) return show(error.message)
+
+  window.location.href = "home.html"
+}
+
+window.signup = async () => {
+  const email = emailInput.value
+  const password = passwordInput.value
+
+  const { error } = await supabase.auth.signUp({ email, password })
+  if (error) return show(error.message)
+
+  show("Check your email to confirm signup.")
+}
+
+function show(msg){
+  message.innerText = msg
+}
+</script>
+
 <style>
-body { font-family: Arial,sans-serif; background:#121212; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-.login-box { background:#1f1f1f; padding:30px; border-radius:10px; width:300px; text-align:center; }
-input, button { width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; }
-button { background:#1e90ff; color:#fff; font-weight:bold; cursor:pointer; }
-a { color:#ff4d4f; display:block; margin-top:15px; text-decoration:none; }
+body { background:#121212; color:white; display:flex; justify-content:center; align-items:center; height:100vh; }
+.box { background:#1f1f1f; padding:30px; border-radius:10px; width:320px; text-align:center; }
+input,button { width:100%; padding:10px; margin:8px 0; border:none; border-radius:5px; }
+button { background:#ff4d4f; color:white; cursor:pointer; }
+#message { font-size:14px; color:#ff4d4f; }
 </style>
 </head>
+
 <body>
-<div class="login-box">
-<h2>BIGULA Email Login</h2>
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-<button onclick="emailLogin()">Login</button>
-<a href="login.html">Back to Login Options</a>
+<div class="box">
+<h2>Email Login</h2>
+<input id="emailInput" type="email" placeholder="Email">
+<input id="passwordInput" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<button onclick="signup()">Sign Up</button>
+<div id="message"></div>
+<a href="login.html" style="color:#ff4d4f">Back</a>
 </div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
-  authDomain: "bigula-d8cab.firebaseapp.com",
-  projectId: "bigula-d8cab",
-  storageBucket: "bigula-d8cab.firebasestorage.app",
-  messagingSenderId: "76364446956",
-  appId: "1:76364446956:web:4417b1c46d6feca02ff9c9"
-};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-window.emailLogin = function() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => { alert("Login successful!"); window.location.href="index.html"; })
-    .catch(e => alert(e.message));
-};
-</script>
 </body>
 </html>
