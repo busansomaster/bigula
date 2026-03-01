@@ -43,102 +43,171 @@ const SUPABASE_URL = "https://uyuofjiiptnbbcuntbfi.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ"
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-const messageBox = document.getElementById('message');
-function showMessage(text, type='error'){
-  messageBox.textContent = text;
-  messageBox.className = type === 'error' ? 'error' : 'success';
-  messageBox.style.display = 'block';
+const messageBox = document.getElementById('message')
+const saveBtn = document.getElementById('saveBtn')
+const avatarInput = document.getElementById('avatarInput')
+const avatarPreview = document.getElementById('avatarPreview')
+
+function showMessage(text, type = 'error') {
+  messageBox.textContent = text
+  messageBox.className = type
+  messageBox.style.display = 'block'
 }
 
-let currentUser = null;
-let lastEditDate = null;
+let currentUser = null
+let lastEditDate = null
+let uploadedAvatarUrl = null
 
+// ================= INIT PROFILE =================
 async function initProfile() {
   const { data: { user }, error } = await supabase.auth.getUser()
-  if(error || !user) {
-    window.location.href="login.html"; return;
-  }
-  currentUser = user;
 
-  // Fetch profile from users table
+  if (error || !user) {
+    window.location.href = "login.html"
+    return
+  }
+
+  currentUser = user
+
   const { data, error: profileError } = await supabase
     .from('users')
     .select('*')
     .eq('id', user.id)
     .single()
 
-  if(profileError) return showMessage(profileError.message, 'error');
+  if (profileError) {
+    showMessage(profileError.message)
+    return
+  }
 
   document.getElementById('username').value = data.username || ''
   document.getElementById('bio').value = data.bio || ''
   document.getElementById('email').value = user.email || user.phone || ''
-  if(data.avatar_url) document.getElementById('avatarPreview').src = data.avatar_url
-  lastEditDate = data.last_edit ? new Date(data.last_edit) : null;
 
-  checkEditLock();
+  if (data.avatar_url) {
+    avatarPreview.src = data.avatar_url
+    uploadedAvatarUrl = data.avatar_url
+  }
+
+  lastEditDate = data.last_edit ? new Date(data.last_edit) : null
+  checkEditLock()
 }
 
+// ================= 14 DAY LOCK =================
 function checkEditLock() {
-  const saveBtn = document.getElementById('saveBtn');
-  if(lastEditDate){
-    const now = new Date();
-    const diff = (now - lastEditDate)/(1000*60*60*24); // days
-    if(diff < 14){
-      saveBtn.disabled = true;
-      showMessage(`Profile can be edited again in ${Math.ceil(14-diff)} days`, 'error');
-    }
+  if (!lastEditDate) return
+
+  const now = new Date()
+  const diffDays = (now - lastEditDate) / (1000 * 60 * 60 * 24)
+
+  if (diffDays < 14) {
+    saveBtn.disabled = true
+    showMessage(
+      `Profile can be edited again in ${Math.ceil(14 - diffDays)} days`,
+      'error'
+    )
   }
 }
 
-// Avatar preview
-document.getElementById('avatarInput').onchange = e => {
+// ================= AVATAR PREVIEW =================
+avatarInput.addEventListener('change', (e) => {
   const file = e.target.files[0]
-  if(file) {
-    document.getElementById('avatarPreview').src = URL.createObjectURL(file)
-  }
-}
+  if (!file) return
 
-// Save profile
-document.getElementById('saveBtn').onclick = async () => {
-  messageBox.style.display = 'none';
-
-  if(document.getElementById('saveBtn').disabled) return;
-
-  const username = document.getElementById('username').value.trim();
-  const bio = document.getElementById('bio').value.trim();
-  const avatarFile = document.getElementById('avatarInput').files[0];
-  let avatar_url = null;
-
-  if(avatarFile){
-    const { data, error } = await supabase.storage
-      .from('avatars')
-      .upload('public/' + currentUser.id + '-' + avatarFile.name, avatarFile, { upsert:true })
-    if(error) return showMessage("Avatar upload failed: "+error.message, 'error');
-    avatar_url = SUPABASE_URL + "/storage/v1/object/public/avatars/" + data.path;
+  // Validate file type
+  if (!file.type.startsWith("image/")) {
+    showMessage("Only image files allowed.")
+    avatarInput.value = ""
+    return
   }
 
-  const updateData = { username, bio, last_edit: new Date() };
-  if(avatar_url) updateData.avatar_url = avatar_url;
+  // Validate size (2MB)
+  if (file.size > 2 * 1024 * 1024) {
+    showMessage("Image too large (Max 2MB).")
+    avatarInput.value = ""
+    return
+  }
 
-  const { error: updateError } = await supabase
-    .from('users')
-    .update(updateData)
-    .eq('id', currentUser.id)
+  avatarPreview.src = URL.createObjectURL(file)
+})
 
-  if(updateError) return showMessage("Update failed: "+updateError.message, 'error');
-  showMessage("Profile updated successfully!", 'success');
+// ================= UPLOAD AVATAR =================
+async function uploadAvatar(file) {
 
-  // lock edits for 14 days
-  document.getElementById('saveBtn').disabled = true;
+  const fileExt = file.name.split('.').pop()
+  const filePath = `${currentUser.id}/avatar.${fileExt}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, { upsert: true })
+
+  if (uploadError) {
+    throw uploadError
+  }
+
+  const { data } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(filePath)
+
+  return data.publicUrl
 }
 
-document.getElementById('logoutBtn').onclick = async () => {
+// ================= SAVE PROFILE =================
+saveBtn.addEventListener('click', async () => {
+
+  messageBox.style.display = 'none'
+  if (saveBtn.disabled) return
+
+  const username = document.getElementById('username').value.trim()
+  const bio = document.getElementById('bio').value.trim()
+  const avatarFile = avatarInput.files[0]
+
+  saveBtn.disabled = true
+  saveBtn.textContent = "Saving..."
+
+  try {
+
+    let avatar_url = uploadedAvatarUrl
+
+    // Upload new avatar if selected
+    if (avatarFile) {
+      avatar_url = await uploadAvatar(avatarFile)
+    }
+
+    const updateData = {
+      username,
+      bio,
+      avatar_url,
+      last_edit: new Date()
+    }
+
+    const { error: updateError } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', currentUser.id)
+
+    if (updateError) throw updateError
+
+    showMessage("Profile updated successfully!", "success")
+
+  } catch (err) {
+    console.error(err)
+    showMessage(err.message || "Something went wrong.")
+    saveBtn.disabled = false
+    saveBtn.textContent = "Save Profile"
+    return
+  }
+
+  saveBtn.textContent = "Saved"
+})
+
+// ================= LOGOUT =================
+document.getElementById('logoutBtn').addEventListener('click', async () => {
   await supabase.auth.signOut()
   window.location.href = "login.html"
-}
+})
 
 initProfile()
 </script>
-
 </body>
 </html>
