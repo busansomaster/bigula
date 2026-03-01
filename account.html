@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account - BIGULA</title>
+<style>
+body { font-family:'Segoe UI',sans-serif; background:#000; color:#fff; display:flex; justify-content:center; align-items:flex-start; padding-top:40px; margin:0; }
+.container { width: 320px; background:#1f1f1f; border-radius:15px; padding:20px; text-align:center; box-shadow:0 0 15px #ff1a1a; }
+h2 { color:#ff1a1a; margin-bottom:20px; }
+input, textarea { width:100%; padding:10px; margin:8px 0; border-radius:8px; border:none; background:#000; color:#fff; }
+textarea { resize:none; }
+button { width:100%; padding:12px; margin:10px 0; border:none; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer; transition:0.2s; }
+button:hover { transform:scale(1.05); }
+.save-btn { background:#ff1a1a; color:#fff; }
+.logout-btn { background:#555; color:#fff; }
+.avatar-img { width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px; }
+#message { text-align:center; padding:10px; border-radius:8px; margin-bottom:10px; display:none; }
+#message.success { background:#0a0; color:white; }
+#message.error { background:#a00; color:white; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>BIGULA Account</h2>
+  <div id="message"></div>
+  <img src="" alt="Avatar" class="avatar-img" id="avatarPreview">
+  <input type="file" id="avatarInput" accept="image/*">
+
+  <input type="text" id="username" placeholder="Username">
+  <textarea id="bio" rows="3" placeholder="Bio"></textarea>
+  <input type="text" id="email" placeholder="Email / Phone" disabled>
+
+  <button class="save-btn" id="saveBtn">Save Profile</button>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const SUPABASE_URL = "https://uyuofjiiptnbbcuntbfi.supabase.co"
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ"
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const messageBox = document.getElementById('message');
+function showMessage(text, type='error'){
+  messageBox.textContent = text;
+  messageBox.className = type === 'error' ? 'error' : 'success';
+  messageBox.style.display = 'block';
+}
+
+let currentUser = null;
+let lastEditDate = null;
+
+async function initProfile() {
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if(error || !user) {
+    window.location.href="login.html"; return;
+  }
+  currentUser = user;
+
+  // Fetch profile from users table
+  const { data, error: profileError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
+  if(profileError) return showMessage(profileError.message, 'error');
+
+  document.getElementById('username').value = data.username || ''
+  document.getElementById('bio').value = data.bio || ''
+  document.getElementById('email').value = user.email || user.phone || ''
+  if(data.avatar_url) document.getElementById('avatarPreview').src = data.avatar_url
+  lastEditDate = data.last_edit ? new Date(data.last_edit) : null;
+
+  checkEditLock();
+}
+
+function checkEditLock() {
+  const saveBtn = document.getElementById('saveBtn');
+  if(lastEditDate){
+    const now = new Date();
+    const diff = (now - lastEditDate)/(1000*60*60*24); // days
+    if(diff < 14){
+      saveBtn.disabled = true;
+      showMessage(`Profile can be edited again in ${Math.ceil(14-diff)} days`, 'error');
+    }
+  }
+}
+
+// Avatar preview
+document.getElementById('avatarInput').onchange = e => {
+  const file = e.target.files[0]
+  if(file) {
+    document.getElementById('avatarPreview').src = URL.createObjectURL(file)
+  }
+}
+
+// Save profile
+document.getElementById('saveBtn').onclick = async () => {
+  messageBox.style.display = 'none';
+
+  if(document.getElementById('saveBtn').disabled) return;
+
+  const username = document.getElementById('username').value.trim();
+  const bio = document.getElementById('bio').value.trim();
+  const avatarFile = document.getElementById('avatarInput').files[0];
+  let avatar_url = null;
+
+  if(avatarFile){
+    const { data, error } = await supabase.storage
+      .from('avatars')
+      .upload('public/' + currentUser.id + '-' + avatarFile.name, avatarFile, { upsert:true })
+    if(error) return showMessage("Avatar upload failed: "+error.message, 'error');
+    avatar_url = SUPABASE_URL + "/storage/v1/object/public/avatars/" + data.path;
+  }
+
+  const updateData = { username, bio, last_edit: new Date() };
+  if(avatar_url) updateData.avatar_url = avatar_url;
+
+  const { error: updateError } = await supabase
+    .from('users')
+    .update(updateData)
+    .eq('id', currentUser.id)
+
+  if(updateError) return showMessage("Update failed: "+updateError.message, 'error');
+  showMessage("Profile updated successfully!", 'success');
+
+  // lock edits for 14 days
+  document.getElementById('saveBtn').disabled = true;
+}
+
+document.getElementById('logoutBtn').onclick = async () => {
+  await supabase.auth.signOut()
+  window.location.href = "login.html"
+}
+
+initProfile()
+</script>
+
+</body>
+</html>
