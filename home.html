@@ -4,17 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIGULA – Home</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc } 
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  window.firebaseModules = { initializeApp, getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc };
-</script>
-
 <style>
-/* KEEPING YOUR ORIGINAL STYLES — UNCHANGED */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:#000;color:#fff;overflow:hidden;}
 .topbar{position:fixed;top:0;width:100%;height:85px;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;}
@@ -40,18 +30,12 @@ video{width:100%;height:100%;object-fit:cover;}
 .title{font-size:14px;margin-top:5px;}
 .stats{position:absolute;right:15px;bottom:120px;display:flex;flex-direction:column;gap:20px;text-align:center;}
 .stat-btn{background:rgba(0,0,0,.6);padding:10px;border-radius:50px;cursor:pointer;font-weight:700;}
-.comment-modal{position:fixed;bottom:0;width:100%;height:60%;background:#111;display:none;flex-direction:column;border-top:3px solid #ff0000;z-index:50;}
-.comment-list{flex:1;overflow-y:auto;padding:15px;}
-.comment-input{display:flex;border-top:1px solid #333;}
-.comment-input input{flex:1;padding:12px;background:#000;border:none;color:#fff;}
-.comment-input button{background:#ff0000;border:none;padding:12px 20px;color:#fff;font-weight:bold;}
 .footer{position:fixed;bottom:0;width:100%;height:70px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;font-size:24px;}
 .footer div{cursor:pointer;transition:.3s;}
 .footer div:hover{color:#ff0000;}
 .disabled{opacity:.4;pointer-events:none;}
 </style>
 </head>
-
 <body>
 
 <div class="topbar">
@@ -76,169 +60,119 @@ video{width:100%;height:100%;object-fit:cover;}
 
 <div class="feed" id="feed"></div>
 
-<div class="comment-modal" id="commentModal">
-  <div class="comment-list" id="commentList"></div>
-  <div class="comment-input">
-    <input type="text" id="commentText" placeholder="Write a comment...">
-    <button onclick="postComment()">Post</button>
-  </div>
-</div>
-
 <div class="footer">
   <div onclick="location.href='home.html'">🏠</div>
   <div id="notifBtn">🔔</div>
   <div id="accountBtn">👤</div>
 </div>
 
-<script>
-/* CONFIG */
-const SUPABASE_URL="https://uyuofjiiptnbbcuntbfi.supabase.co";
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const SUPABASE_URL = "https://uyuofjiiptnbbcuntbfi.supabase.co"
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ"
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-/* FIREBASE INIT */
-const { initializeApp, getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc } = window.firebaseModules;
+let currentUser = null;
 
-const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
-  authDomain: "bigula-d8cab.firebaseapp.com",
-  projectId: "bigula-d8cab",
-};
-
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-
-/* USER */
-const isLoggedIn=localStorage.getItem("userToken");
-const userId=localStorage.getItem("userId");
-const interests=JSON.parse(localStorage.getItem("userInterests"))||[];
-
-/* BUTTON STATES */
-const loginBtn=document.querySelector(".login-btn");
-const uploadBtn=document.querySelector(".upload-btn");
-const accountBtn=document.getElementById("accountBtn");
-
-if(isLoggedIn){
-  loginBtn.textContent="Dashboard";
-  loginBtn.onclick=()=>location.href="dashboard.html";
-  uploadBtn.classList.remove("disabled");
-  uploadBtn.onclick=()=>location.href="upload.html";
-  accountBtn.onclick=()=>location.href="accounts.html";
-}else{
-  loginBtn.onclick=()=>location.href="login.html";
-  accountBtn.classList.add("disabled");
+// Check auth
+async function initUser(){
+  const { data: { user } } = await supabase.auth.getUser()
+  currentUser = user
+  const loginBtn = document.querySelector(".login-btn")
+  const uploadBtn = document.querySelector(".upload-btn")
+  const accountBtn = document.getElementById("accountBtn")
+  if(user){
+    loginBtn.textContent="Dashboard"
+    loginBtn.onclick=()=>location.href="dashboard.html"
+    uploadBtn.classList.remove("disabled")
+    uploadBtn.onclick=()=>location.href="upload.html"
+    accountBtn.onclick=()=>location.href="account.html"
+  }else{
+    loginBtn.onclick=()=>location.href="login.html"
+    accountBtn.classList.add("disabled")
+  }
 }
+initUser()
 
-/* FETCH VIDEOS */
+// Fetch videos
 async function fetchVideos(type="foryou"){
-  try{
-    let queryBuilder=supabase.from("videos").select("*");
-
-    if(type==="latest") queryBuilder=queryBuilder.order("created_at",{ascending:false});
-    if(type==="viral") queryBuilder=queryBuilder.order("views",{ascending:false});
-    if(type==="foryou" && interests.length)
-      queryBuilder=queryBuilder.in("category",interests);
-
-    const {data,error}=await queryBuilder;
-    if(error){console.error(error);return;}
-    if(data) renderVideos(data);
-  }catch(err){console.error(err);}
+  let queryBuilder = supabase.from("videos").select("*")
+  if(type==="latest") queryBuilder=queryBuilder.order("created_at",{ascending:false})
+  if(type==="viral") queryBuilder=queryBuilder.order("views",{ascending:false})
+  if(type==="foryou" && currentUser){
+    // Example: could filter by user's interests
+  }
+  const { data, error } = await queryBuilder
+  if(error){ console.error(error); return }
+  if(data) renderVideos(data)
 }
 
-/* RENDER */
+// Render feed
 function renderVideos(videos){
-  const feed=document.getElementById("feed");
-  feed.innerHTML="";
-
+  const feed=document.getElementById("feed")
+  feed.innerHTML=""
   videos.forEach(video=>{
-    const card=document.createElement("div");
-    card.className="video-card";
-
+    const card=document.createElement("div")
+    card.className="video-card"
     card.innerHTML=`
       <video src="${video.video_url}" muted loop playsinline></video>
       <div class="info">
         <div>
           <span class="username" onclick="openProfile('${video.user_id}')">@${video.username}</span>
-          <span class="follow" onclick="followUser('${video.user_id}')">➕</span>
+          ${currentUser? `<span class="follow" onclick="followUser('${video.user_id}')">➕</span>` : ''}
         </div>
-        <div class="title">${video.title||""}</div>
+        <div class="title">${video.title||''}</div>
       </div>
       <div class="stats">
         <div class="stat-btn">👁 ${video.views||0}</div>
-        <div class="stat-btn" onclick="openComments('${video.id}','${video.user_id}')">💬 <span id="cc-${video.id}">0</span></div>
-        <div class="stat-btn">❤️ <span id="lc-${video.id}">0</span></div>
       </div>
-    `;
-
-    feed.appendChild(card);
-    loadCounts(video.id);
-  });
-
-  setupAutoplay();
+    `
+    feed.appendChild(card)
+  })
+  setupAutoplay()
 }
 
-/* LOAD COUNTS */
-async function loadCounts(id){
-  try{
-    const q=query(collection(db,"comments"),where("videoId","==",id));
-    const snapshot=await getDocs(q);
-    document.getElementById("cc-"+id).innerText=snapshot.size;
-
-    const likesDoc=await getDoc(doc(db,"likes",id));
-    if(likesDoc.exists())
-      document.getElementById("lc-"+id).innerText=likesDoc.data().count||0;
-  }catch(e){console.error(e);}
+// Follow
+async function followUser(uid){
+  if(!currentUser) return alert("Login first")
+  await supabase.from("followers").insert({ user_id: uid, follower_id: currentUser.id })
+  alert("Followed user!")
 }
 
-/* PROFILE */
-function openProfile(id){
-  window.open("profile.html?uid="+id,"_blank");
+function openProfile(uid){
+  location.href = `profile.html?uid=${uid}`
 }
 
-/* FOLLOW */
-function followUser(id){
-  if(!isLoggedIn) return;
-  addDoc(collection(db,"follows"),{follower:userId,following:id})
-  .catch(e=>console.error(e));
-}
-
-/* AUTOPLAY */
+// Autoplay videos
 function setupAutoplay(){
-  const vids=document.querySelectorAll("video");
+  const vids=document.querySelectorAll("video")
   const observer=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting) e.target.play();
-      else e.target.pause();
-    });
-  },{threshold:.8});
-  vids.forEach(v=>observer.observe(v));
+    entries.forEach(e=> e.isIntersecting ? e.target.play() : e.target.pause() )
+  },{threshold:0.8})
+  vids.forEach(v=>observer.observe(v))
 }
 
-/* SEARCH */
-document.querySelector(".search").onclick=()=>{
-  const bar=document.querySelector(".search-bar");
-  bar.style.display=bar.style.display==="block"?"none":"block";
-};
-
-document.getElementById("searchInput").addEventListener("input",e=>{
-  const term=e.target.value.toLowerCase();
-  document.querySelectorAll(".video-card").forEach(card=>{
-    card.style.display=card.innerText.toLowerCase().includes(term)?"flex":"none";
-  });
-});
-
-/* TABS */
+// Tabs
 document.querySelectorAll(".tab").forEach(tab=>{
   tab.onclick=()=>{
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    tab.classList.add("active");
-    fetchVideos(tab.dataset.feed);
-  };
-});
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
+    tab.classList.add("active")
+    fetchVideos(tab.dataset.feed)
+  }
+})
 
-/* INIT */
-fetchVideos("foryou");
+// Search
+document.querySelector(".search").onclick=()=>{
+  document.querySelector(".search-bar").style.display="block"
+}
+document.getElementById("searchInput").addEventListener("input",e=>{
+  const term=e.target.value.toLowerCase()
+  document.querySelectorAll(".video-card").forEach(card=>{
+    card.style.display=card.innerText.toLowerCase().includes(term)?"flex":"none"
+  })
+})
+
+fetchVideos()
 </script>
-
 </body>
 </html>
