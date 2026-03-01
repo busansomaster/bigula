@@ -14,7 +14,8 @@ button, input{width:100%;padding:12px;margin-bottom:12px;border-radius:8px;borde
 input{background:#2a2a40;color:white;}
 input:focus{outline:none;border:1px solid #ff4d4f;}
 button{background:#ff4d4f;color:white;cursor:pointer;transition:.3s;font-weight:bold;}
-button:hover{background:#e03a3a;}
+button:hover:not(.disabled){background:#e03a3a;}
+button.disabled{opacity:.5;cursor:not-allowed;}
 .select-method{display:flex;gap:10px;margin-bottom:20px;}
 .select-method button{flex:1;}
 .hidden{display:none;}
@@ -30,13 +31,12 @@ button:hover{background:#e03a3a;}
 
 <div class="container">
   <h1>BIGULA Sign Up</h1>
-
   <div id="message"></div>
 
   <!-- Step 1: Choose Signup Method -->
   <div id="signup-methods" class="select-method">
     <button onclick="chooseMethod('google')">Google</button>
-    <button onclick="chooseMethod('phone')">Phone</button>
+    <button class="disabled" title="Phone signup disabled">Phone</button>
     <button onclick="chooseMethod('email')">Email</button>
   </div>
 
@@ -47,7 +47,6 @@ button:hover{background:#e03a3a;}
     <input type="text" id="username" placeholder="Username" />
     <input type="text" id="display_name" placeholder="Display Name" />
     <input type="text" id="bio" placeholder="Bio (optional)" />
-    <input type="text" id="phone" placeholder="Phone Number (+256...)" class="hidden"/>
     <input type="email" id="email" placeholder="Email" class="hidden"/>
     <input type="password" id="password" placeholder="Password" class="hidden"/>
     <button id="signup-btn">Sign Up</button>
@@ -56,8 +55,8 @@ button:hover{background:#e03a3a;}
 </div>
 
 <script type="module">
-const SUPABASE_URL = "https://uyuofjiiptnbbcuntbfi.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
+const SUPABASE_URL="https://uyuofjiiptnbbcuntbfi.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const messageBox = document.getElementById('message');
@@ -67,7 +66,7 @@ function showMessage(text, type='error'){
   messageBox.style.display = 'block';
 }
 
-// Preview Avatar
+// Avatar preview
 const avatarInput = document.getElementById("avatar");
 const avatarPreview = document.getElementById("avatar-preview");
 avatarInput.addEventListener("change", e=>{
@@ -77,48 +76,40 @@ avatarInput.addEventListener("change", e=>{
 
 let signupMethod = null;
 
-// Step 1: Choose method
+// Choose signup method
 function chooseMethod(method){
   signupMethod = method;
   document.getElementById('signup-methods').classList.add('hidden');
   document.getElementById('profile-form').classList.remove('hidden');
 
-  if(method === 'google') googleSignup();
-  if(method === 'phone') document.getElementById('phone').classList.remove('hidden');
-  if(method === 'email') {
+  if(method === 'google'){
+    supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/home.html' }});
+  }
+  if(method === 'email'){
     document.getElementById('email').classList.remove('hidden');
     document.getElementById('password').classList.remove('hidden');
   }
 }
 
-// Google Signup
-async function googleSignup(){
-  const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-  if(error) return showMessage(error.message, 'error');
-  // Supabase handles redirect automatically
-}
-
-// Email/Phone Signup
+// Email signup
 document.getElementById('signup-btn').onclick = async function(){
   messageBox.style.display = 'none';
   const username = document.getElementById("username").value.trim();
   const display_name = document.getElementById("display_name").value.trim();
   const bio = document.getElementById("bio").value.trim();
-  const phone = document.getElementById("phone").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const avatarFile = avatarInput.files[0];
 
-  if(!username || !display_name || (signupMethod!=='google' && (!phone && !email)) || (signupMethod==='email' && !password)){
+  if(!username || !display_name || !email || !password){
     return showMessage("Please fill all required fields", 'error');
   }
 
-  let authEmail = email || (phone ? phone + "@bigula.app" : null);
-
+  // Sign up via email
   const { data: userData, error } = await supabase.auth.signUp({
-    email: authEmail,
-    password: password || Math.random().toString(36).slice(-8),
-    options: { data: { phone } }
+    email,
+    password,
+    options: { data: { username, display_name, bio } }
   });
   if(error) return showMessage(error.message, 'error');
 
