@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIGULA – Sign Up</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:#121212;color:white;display:flex;justify-content:center;align-items:center;height:100vh;}
+.container{width:100%;max-width:400px;background:#1f1f2f;padding:30px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+h1{text-align:center;margin-bottom:25px;color:#ff4d4f;}
+input,button{width:100%;padding:12px;margin-bottom:15px;border-radius:8px;border:none;font-size:15px;}
+input{background:#2a2a40;color:white;}
+input:focus{outline:none;border:1px solid #ff4d4f;}
+button{background:#ff4d4f;color:white;cursor:pointer;transition:.3s;font-weight:bold;}
+button:hover{background:#e03a3a;}
+.link{text-align:center;font-size:14px;margin-top:10px;}
+.link a{color:#ff4d4f;text-decoration:none;}
+#avatar-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:15px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>BIGULA Sign Up</h1>
+
+  <!-- Avatar Preview -->
+  <img id="avatar-preview" src="https://via.placeholder.com/80" alt="Profile Photo">
+
+  <input type="file" id="avatar" accept="image/*" />
+
+  <input type="text" id="username" placeholder="Username" />
+  <input type="text" id="display_name" placeholder="Display Name" />
+  <input type="text" id="bio" placeholder="Bio (optional)" />
+
+  <input type="text" id="phone" placeholder="Phone Number (+256...)" />
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Password" />
+
+  <button onclick="signup()">Sign Up</button>
+
+  <div class="link">
+    Already have an account? <a href="login.html">Login</a>
+  </div>
+
+  <hr style="border-color:#333;margin:15px 0;">
+  <button onclick="googleSignup()" style="background:#4285F4;">Sign Up with Google</button>
+</div>
+
+<script type="module">
+const SUPABASE_URL="https://uyuofjiiptnbbcuntbfi.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Preview Avatar
+const avatarInput = document.getElementById("avatar");
+const avatarPreview = document.getElementById("avatar-preview");
+avatarInput.addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(file){
+    avatarPreview.src = URL.createObjectURL(file);
+  }
+});
+
+// ------------------------
+// Google Signup
+// ------------------------
+async function googleSignup(){
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google'
+  });
+  if(error) return alert(error.message);
+  // redirect handled by Supabase
+}
+
+// ------------------------
+// Email/Phone Signup
+// ------------------------
+async function signup(){
+  const username = document.getElementById("username").value.trim();
+  const display_name = document.getElementById("display_name").value.trim();
+  const bio = document.getElementById("bio").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const avatarFile = avatarInput.files[0];
+
+  if(!username || !display_name || (!phone && !email) || !password){
+    alert("Please fill all required fields (username, display name, phone/email, password)");
+    return;
+  }
+
+  // ------------------------
+  // Create user in Supabase Auth
+  // ------------------------
+  let authEmail = email;
+  if(phone && !email){
+    // create fake email alias for phone
+    authEmail = phone + "@bigula.app";
+  }
+
+  const { data: userData, error } = await supabase.auth.signUp({
+    email: authEmail,
+    password: password,
+    options: { data: { phone } }
+  });
+
+  if(error) return alert(error.message);
+
+  const userId = userData.user.id;
+
+  // ------------------------
+  // Upload Avatar (if any)
+  // ------------------------
+  let avatar_url = "";
+  if(avatarFile){
+    const { data: avatarData, error: avatarError } = await supabase.storage
+      .from('avatars')
+      .upload('public/' + userId + '-' + avatarFile.name, avatarFile);
+
+    if(avatarError){
+      console.warn("Avatar upload failed:", avatarError.message);
+    } else {
+      avatar_url = SUPABASE_URL + "/storage/v1/object/public/avatars/" + avatarData.path;
+    }
+  }
+
+  // ------------------------
+  // Insert profile in users table
+  // ------------------------
+  const { error: profileError } = await supabase
+    .from('users')
+    .insert([{
+      id: userId,
+      username,
+      display_name,
+      bio,
+      avatar_url
+    }]);
+
+  if(profileError) return alert(profileError.message);
+
+  alert("Signup successful!");
+  window.location.href = "home.html";
+}
+</script>
+</body>
+</html>
