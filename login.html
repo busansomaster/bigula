@@ -4,22 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login - BIGULA</title>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+  "https://uyuofjiiptnbbcuntbfi.supabase.co",
+  "YOUR_ANON_PUBLIC_KEY"
+)
+
+const { data } = await supabase.auth.getSession()
+if (data.session) {
+  window.location.href = "home.html"
+}
+</script>
+
 <style>
 body { font-family: Arial,sans-serif; background:#121212; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
 .container { text-align:center; }
 h1 { font-size:2em; color:#ff4d4f; margin-bottom:30px; }
 .login-option { background:#1f1f1f; padding:20px; margin:10px 0; border-radius:10px; cursor:pointer; transition:0.2s; }
-.login-option:hover { background:#ff4d4f; color:#fff; }
+.login-option:hover { background:#ff4d4f; }
 </style>
 </head>
+
 <body>
 <div class="container">
   <h1>BIGULA</h1>
-  <div class="login-option" onclick="window.location.href='login-phone.html'">Login with Phone Number</div>
-  <div class="login-option" onclick="window.location.href='login-email.html'">Login with Email/Password</div>
-  <div class="login-option" onclick="window.location.href='login-google.html'">Login with Google</div>
-  <!-- TikTok login placeholder -->
-  <!-- <div class="login-option" onclick="window.location.href='login-tiktok.html'">Login with TikTok (Future)</div> -->
+
+  <div class="login-option" onclick="location.href='login-phone.html'">Login with Phone</div>
+  <div class="login-option" onclick="location.href='login-google.html'">Login with Google</div>
+    <div class="login-option" onclick="location.href='login-email.html'">Login / Sign Up with Email</div>
 </div>
 </body>
 </html>
