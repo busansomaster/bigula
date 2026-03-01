@@ -10,7 +10,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient(
   "https://uyuofjiiptnbbcuntbfi.supabase.co",
-  "YOUR_ANON_PUBLIC_KEY"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ"
 )
 
 const { data } = await supabase.auth.getSession()
@@ -38,3 +38,4 @@ h1 { font-size:2em; color:#ff4d4f; margin-bottom:30px; }
 </div>
 </body>
 </html>
+
