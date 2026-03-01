@@ -4,136 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIGULA - My Dashboard</title>
-
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family: Arial,sans-serif; }
-
 body { background:#0f0f0f; color:#fff; }
-
-header {
-  background:#1a1a1a;
-  padding:15px 25px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
+header { background:#1a1a1a; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
 header h1 { color:#ff0050; font-size:1.6rem; }
-
-header button {
-  background:#ff0050;
-  border:none;
-  padding:8px 18px;
-  border-radius:20px;
-  color:#fff;
-  cursor:pointer;
-}
-
-.container {
-  display:flex;
-  width:95%;
-  margin:20px auto;
-  gap:20px;
-  min-height:75vh;
-}
-
-.sidebar {
-  width:180px; /* smaller */
-  background:#161616;
-  padding:15px;
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-
-.sidebar .menu button {
-  width:100%;
-  padding:8px;
-  margin-bottom:8px;
-  font-size:13px;
-  border:none;
-  border-radius:8px;
-  background:#ff0050;
-  color:#fff;
-  cursor:pointer;
-}
-
-.sidebar .menu button:hover {
-  background:#e60045;
-}
-
-.footer-nav button {
-  width:100%;
-  padding:8px;
-  margin-top:8px;
-  font-size:13px;
-  border:none;
-  border-radius:8px;
-  background:#333;
-  color:#fff;
-  cursor:pointer;
-}
-
-.main-content {
-  flex:1; /* takes most space */
-  background:#141414;
-  padding:25px;
-  border-radius:12px;
-  overflow-y:auto;
-}
-
-.main-content h2 {
-  color:#ff0050;
-  margin-bottom:20px;
-}
-
-.video-item {
-  background:#1c1c1c;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:12px;
-}
-
-.video-item p {
-  font-size:14px;
-  margin-bottom:5px;
-}
-
-.progress-bar {
-  width:100%;
-  background:#333;
-  height:8px;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:6px;
-}
-
-.progress-fill {
-  height:8px;
-  background:#ff0050;
-}
-
-.monetize-btn {
-  margin-top:15px;
-  padding:10px 15px;
-  background:#00c853;
-  border:none;
-  border-radius:8px;
-  color:#fff;
-  cursor:pointer;
-}
+.container { display:flex; width:95%; margin:20px auto; gap:20px; min-height:75vh; }
+.sidebar { width:180px; background:#161616; padding:15px; border-radius:12px; display:flex; flex-direction:column; justify-content:space-between; }
+.sidebar .menu button { width:100%; padding:8px; margin-bottom:8px; font-size:13px; border:none; border-radius:8px; background:#ff0050; color:#fff; cursor:pointer; }
+.sidebar .menu button:hover { background:#e60045; }
+.footer-nav button { width:100%; padding:8px; margin-top:8px; font-size:13px; border:none; border-radius:8px; background:#333; color:#fff; cursor:pointer; }
+.main-content { flex:1; background:#141414; padding:25px; border-radius:12px; overflow-y:auto; }
+.main-content h2 { color:#ff0050; margin-bottom:20px; }
+.video-item { background:#1c1c1c; padding:15px; border-radius:10px; margin-bottom:12px; }
+.video-item p { font-size:14px; margin-bottom:5px; }
+.progress-bar { width:100%; background:#333; height:8px; border-radius:10px; overflow:hidden; margin-top:6px; }
+.progress-fill { height:8px; background:#ff0050; }
+.monetize-btn { margin-top:15px; padding:10px 15px; background:#00c853; border:none; border-radius:8px; color:#fff; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>BIGULA Dashboard</h1>
-  <button onclick="alert('Sign out coming soon')">Sign Out</button>
 </header>
 
 <div class="container">
-
   <div class="sidebar">
     <div class="menu">
       <button onclick="showMyVideos()">My Videos</button>
@@ -142,7 +38,6 @@ header button {
       <button onclick="showFollowing()">Following</button>
       <button onclick="showFollowers()">Followers</button>
     </div>
-
     <div class="footer-nav">
       <button onclick="location.href='account.html'">My Account</button>
       <button onclick="location.href='home.html'">Home</button>
@@ -154,103 +49,136 @@ header button {
     <h2>Welcome to your dashboard</h2>
     <p>Select an option from the menu.</p>
   </div>
-
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const firebaseConfig = {
- apiKey: "AIzaSyB8wGlVLw7ECGTQns65Ff8UyTT_on8OivY",
-  authDomain: "bigula-d8cab.firebaseapp.com",
-  projectId: "bigula-d8cab",
-};
+const SUPABASE_URL = "https://uyuofjiiptnbbcuntbfi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+let currentUser = null;
 
-const main = document.getElementById("mainContent");
+// Initialize user
+async function initUser() {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if(error || !user) {
+    location.href = "login.html";
+    return;
+  }
+  currentUser = user;
+}
+
+initUser();
 
 function uploadVideo() {
   location.href = "upload.html";
 }
 
-window.showMyVideos = function() {
+// -----------------
+// My Videos
+// -----------------
+window.showMyVideos = async function() {
+  const main = document.getElementById("mainContent");
   main.innerHTML = "<h2>My Videos</h2>";
 
-  const user = auth.currentUser;
-  if (!user) {
-    main.innerHTML += "<p>Please login.</p>";
-    return;
-  }
+  if(!currentUser) return main.innerHTML += "<p>Please login.</p>";
 
-  const q = query(
-    collection(db, "videos"),
-    where("creatorId", "==", user.uid)
-  );
+  const { data: videos, error } = await supabase
+    .from('videos')
+    .select('*')
+    .eq('creator_id', currentUser.id)
+    .order('created_at', { ascending: false });
 
-  onSnapshot(q, (snapshot) => {
-    main.innerHTML = "<h2>My Videos</h2>";
+  if(error) return main.innerHTML += `<p>Error: ${error.message}</p>`;
 
-    snapshot.forEach(doc => {
-      const video = doc.data();
+  if(videos.length === 0) return main.innerHTML += "<p>No videos uploaded yet.</p>";
 
-      const div = document.createElement("div");
-      div.className = "video-item";
+  videos.forEach(video => {
+    const div = document.createElement('div');
+    div.className = "video-item";
 
-      if(video.status === "uploading") {
-        div.innerHTML = `
-          <p><strong>${video.title}</strong></p>
-          <p>Status: Uploading (${video.progress || 0}%)</p>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width:${video.progress || 0}%"></div>
-          </div>
-        `;
-      } else {
-        div.innerHTML = `
-          <p><strong>${video.title}</strong></p>
-          <p>Status: Published</p>
-          <p>👁 ${video.views} | ❤️ ${video.likesCount} | 💬 ${video.commentsCount}</p>
-        `;
-      }
-
-      main.appendChild(div);
-    });
+    if(video.video_status === "uploading") {
+      div.innerHTML = `
+        <p><strong>${video.title}</strong></p>
+        <p>Status: Uploading (${video.progress || 0}%)</p>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${video.progress || 0}%"></div>
+        </div>`;
+    } else {
+      div.innerHTML = `
+        <p><strong>${video.title}</strong></p>
+        <p>Status: Published</p>
+        <p>👁 ${video.views} | ❤️ ${video.likes} | 💬 ${video.comments}</p>`;
+    }
+    main.appendChild(div);
   });
-};
+}
 
+// -----------------
+// Monetize
+// -----------------
 window.showMonetize = function() {
+  const main = document.getElementById("mainContent");
   main.innerHTML = "<h2>Monetization</h2>";
+  main.innerHTML += `
+    <p>To begin monetizing:</p>
+    <ul>
+      <li>Upload at least 3 videos</li>
+      <li>Get 1,000 views total</li>
+      <li>Follow community guidelines</li>
+    </ul>
+    <button class="monetize-btn" onclick="location.href='monetize.html'">
+      Begin Monetize
+    </button>`;
+}
 
-  const monetized = false; // Keep existing logic untouched
+// -----------------
+// Following
+// -----------------
+window.showFollowing = async function() {
+  const main = document.getElementById("mainContent");
+  main.innerHTML = "<h2>Following</h2>";
 
-  if(monetized) {
-    main.innerHTML += "<p>Your earnings: $0.00</p>";
-  } else {
-    main.innerHTML += `
-      <p>To begin monetizing:</p>
-      <ul>
-        <li>Upload at least 3 videos</li>
-        <li>Get 1,000 views total</li>
-        <li>Follow community guidelines</li>
-      </ul>
-      <button class="monetize-btn" onclick="location.href='monetize.html'">
-        Begin Monetize
-      </button>
-    `;
-  }
-};
+  const { data, error } = await supabase
+    .from('followers')
+    .select('followed_id, users(username, display_name, avatar_url)')
+    .eq('follower_id', currentUser.id);
 
-window.showFollowing = function() {
-  main.innerHTML = "<h2>Following</h2><p>Following list coming soon...</p>";
-};
+  if(error) return main.innerHTML += `<p>Error: ${error.message}</p>`;
+  if(data.length === 0) return main.innerHTML += "<p>You are not following anyone.</p>";
 
-window.showFollowers = function() {
-  main.innerHTML = "<h2>Followers</h2><p>Followers list coming soon...</p>";
-};
+  data.forEach(f => {
+    const div = document.createElement('div');
+    div.className = "video-item";
+    div.innerHTML = `<p><strong>${f.users.display_name}</strong> (@${f.users.username})</p>`;
+    main.appendChild(div);
+  });
+}
+
+// -----------------
+// Followers
+// -----------------
+window.showFollowers = async function() {
+  const main = document.getElementById("mainContent");
+  main.innerHTML = "<h2>Followers</h2>";
+
+  const { data, error } = await supabase
+    .from('followers')
+    .select('follower_id, users(username, display_name, avatar_url)')
+    .eq('followed_id', currentUser.id);
+
+  if(error) return main.innerHTML += `<p>Error: ${error.message}</p>`;
+  if(data.length === 0) return main.innerHTML += "<p>No followers yet.</p>";
+
+  data.forEach(f => {
+    const div = document.createElement('div');
+    div.className = "video-item";
+    div.innerHTML = `<p><strong>${f.users.display_name}</strong> (@${f.users.username})</p>`;
+    main.appendChild(div);
+  });
+}
 </script>
 
 </body>
