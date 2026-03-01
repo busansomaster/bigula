@@ -9,10 +9,19 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// Replace with real authenticated user
+/* ===============================
+   AUTH CHECK
+================================= */
+
+const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+if (authError || !user) {
+  window.location.href = "/login.html"
+  throw new Error("User not authenticated")
+}
+
 const currentUser = {
-  id: "USER_ID",
-  displayName: "DemoUser"
+  id: user.id
 }
 
 const feed = document.getElementById("feed")
@@ -22,47 +31,51 @@ const feed = document.getElementById("feed")
 ================================= */
 
 async function loadFeed() {
+
   const { data: videos, error } = await supabase
     .from("videos")
     .select("*")
     .order("created_at", { ascending: false })
 
   if (error) {
-    console.error(error)
+    console.error("Feed error:", error.message)
     return
   }
 
   feed.innerHTML = ""
 
-  videos.forEach(video => {
-    const card = createVideoCard(video)
+  for (const video of videos) {
+    const card = await createVideoCard(video)
     feed.appendChild(card)
-  })
+  }
 }
 
-loadFeed()
+await loadFeed()
 
 /* ===============================
    CREATE VIDEO CARD
 ================================= */
 
-function createVideoCard(video) {
+async function createVideoCard(video) {
 
   const card = document.createElement("div")
   card.className = "video-card"
   card.dataset.id = video.id
   card.dataset.uploader = video.creator_id
 
+  const likeCount = await getLikeCount(video.id)
+  const commentCount = await getCommentCount(video.id)
+
   card.innerHTML = `
     <video src="${video.video_url}" controls></video>
 
     <div class="actions">
       <button class="like-btn">
-        ❤️ <span class="like-count">${video.likes_count || 0}</span>
+        ❤️ <span class="like-count">${likeCount}</span>
       </button>
 
       <button class="comment-toggle">
-        💬 <span class="comment-count">${video.comments_count || 0}</span>
+        💬 <span class="comment-count">${commentCount}</span>
       </button>
     </div>
 
@@ -88,20 +101,17 @@ function attachLikeLogic(card, video) {
 
     const { data: existing } = await supabase
       .from("likes")
-      .select("*")
+      .select("id")
       .eq("video_id", video.id)
       .eq("user_id", currentUser.id)
 
     if (existing && existing.length > 0) {
-
       await supabase
         .from("likes")
         .delete()
         .eq("video_id", video.id)
         .eq("user_id", currentUser.id)
-
     } else {
-
       await supabase
         .from("likes")
         .insert({
@@ -111,18 +121,19 @@ function attachLikeLogic(card, video) {
         })
     }
 
-    updateLikeCount(video.id, likeCountEl)
+    const newCount = await getLikeCount(video.id)
+    likeCountEl.textContent = newCount
   }
 }
 
-async function updateLikeCount(videoId, element) {
+async function getLikeCount(videoId) {
 
   const { count } = await supabase
     .from("likes")
     .select("*", { count: "exact", head: true })
     .eq("video_id", videoId)
 
-  element.textContent = count || 0
+  return count || 0
 }
 
 /* ===============================
@@ -134,12 +145,12 @@ function attachCommentLogic(card, video) {
   const toggleBtn = card.querySelector(".comment-toggle")
   const box = card.querySelector(".comments-box")
 
-  toggleBtn.onclick = () => {
+  toggleBtn.onclick = async () => {
 
     box.classList.toggle("hidden")
 
     if (!box.dataset.loaded) {
-      loadComments(video, box)
+      await loadComments(video, box)
       box.dataset.loaded = "true"
     }
   }
@@ -149,7 +160,7 @@ async function loadComments(video, box) {
 
   const { data: comments } = await supabase
     .from("comments")
-    .select("*")
+    .select("*, users(username)")
     .eq("video_id", video.id)
     .order("created_at", { ascending: true })
 
@@ -161,25 +172,36 @@ async function loadComments(video, box) {
 
   const list = box.querySelector(".comments-list")
 
-  comments.forEach(c => {
+  comments?.forEach(c => {
     list.appendChild(createCommentElement(c, video))
   })
 
   box.querySelector(".send-comment").onclick = async () => {
 
     const input = box.querySelector(".comment-input")
+    const text = input.value.trim()
 
-    if (!input.value.trim()) return
+    if (!text) return
 
     await supabase.from("comments").insert({
       video_id: video.id,
       user_id: currentUser.id,
-      text: input.value.trim(),
+      text: text,
       created_at: new Date()
     })
 
     input.value = ""
   }
+}
+
+async function getCommentCount(videoId) {
+
+  const { count } = await supabase
+    .from("comments")
+    .select("*", { count: "exact", head: true })
+    .eq("video_id", videoId)
+
+  return count || 0
 }
 
 /* ===============================
@@ -192,13 +214,13 @@ function createCommentElement(comment, video) {
   div.className = "comment"
 
   div.innerHTML = `
-    <span><b>${comment.user_id}</b>: ${comment.text}</span>
+    <span><b>${comment.users?.username || "User"}</b>: ${comment.text}</span>
     <div class="comment-actions"></div>
   `
 
   const actions = div.querySelector(".comment-actions")
 
-  // Uploader can delete
+  // Video owner can delete
   if (video.creator_id === currentUser.id) {
 
     const delBtn = document.createElement("button")
@@ -247,15 +269,23 @@ supabase
   .on(
     "postgres_changes",
     { event: "INSERT", schema: "public", table: "comments" },
-    (payload) => {
+    async (payload) => {
 
       const videoId = payload.new.video_id
-
       const card = document.querySelector(`[data-id="${videoId}"]`)
       if (!card) return
 
       const list = card.querySelector(".comments-list")
       if (!list) return
+
+      // fetch username for new comment
+      const { data } = await supabase
+        .from("users")
+        .select("username")
+        .eq("id", payload.new.user_id)
+        .single()
+
+      payload.new.users = data
 
       list.appendChild(
         createCommentElement(payload.new, {
@@ -279,13 +309,13 @@ supabase
     async (payload) => {
 
       const videoId = payload.new?.video_id || payload.old?.video_id
+      if (!videoId) return
 
       const card = document.querySelector(`[data-id="${videoId}"]`)
       if (!card) return
 
       const likeCountEl = card.querySelector(".like-count")
-
-      updateLikeCount(videoId, likeCountEl)
+      likeCountEl.textContent = await getLikeCount(videoId)
     }
   )
   .subscribe()
