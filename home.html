@@ -7,31 +7,31 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:#000;color:#fff;overflow:hidden;}
-.topbar{position:fixed;top:0;width:100%;height:85px;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;padding:0 15px;}
-.logo{font-size:32px;font-weight:900;letter-spacing:4px;color:#ff0000;text-shadow:0 0 20px rgba(255,0,0,.8);line-height:85px;display:inline-block;}
-.top-row{display:flex;justify-content:space-between;align-items:center;height:85px;}
-.tabs{display:flex;gap:25px;}
-.tab{cursor:pointer;font-weight:700;opacity:.6;transition:.3s;}
+.topbar{position:fixed;top:0;width:100%;height:100px;background:linear-gradient(to bottom,#000 80%,transparent);z-index:20;padding:0 15px;display:flex;flex-direction:column;}
+.logo{font-size:32px;font-weight:900;letter-spacing:4px;color:#ff0000;text-shadow:0 0 20px rgba(255,0,0,.8);line-height:40px;}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-top:5px;}
+.tabs{display:flex;gap:25px;margin-top:10px;}
+.tab{cursor:pointer;font-weight:700;opacity:.6;transition:.3s;font-size:18px;}
 .tab.active{opacity:1;color:#ff0000;border-bottom:3px solid #ff0000;padding-bottom:4px;}
 .actions{display:flex;gap:12px;align-items:center;}
-.btn{padding:10px 22px;border-radius:40px;border:none;font-weight:800;cursor:pointer;transition:.3s;font-size:14px;}
+.btn{padding:10px 22px;border-radius:40px;border:none;font-weight:800;cursor:pointer;transition:.3s;font-size:16px;}
 .login-btn{background:#fff;color:#000;}
 .upload-btn{background:#ff0000;color:#fff;}
 .upload-btn.disabled{opacity:.4;cursor:not-allowed;}
-.search{font-size:22px;cursor:pointer;color:#ff0000;margin-left:10px;}
-.search-bar{position:fixed;top:85px;width:100%;background:#111;padding:10px 15px;display:none;z-index:19;border-bottom:1px solid #222;}
+.search{font-size:26px;cursor:pointer;color:#ff0000;margin-left:10px;}
+.search-bar{position:fixed;top:100px;width:100%;background:#111;padding:10px 15px;display:none;z-index:19;border-bottom:1px solid #222;}
 .search-bar input{width:100%;padding:12px;border-radius:40px;border:1px solid #333;background:#000;color:#fff;font-size:16px;}
-.feed{position:absolute;top:125px;bottom:70px;width:100%;overflow-y:scroll;scroll-snap-type:y mandatory;}
-.video-card{height:90vh;width:90%;max-width:600px;margin:15px auto;position:relative;scroll-snap-align:start;border:2px solid #ff1a1a;border-radius:15px;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-direction:column;}
+.feed{position:absolute;top:150px;bottom:70px;width:100%;overflow-y:scroll;scroll-snap-type:y mandatory;display:flex;flex-direction:column;align-items:center;}
+.video-card{height:auto;width:90%;max-width:600px;margin:20px auto;position:relative;scroll-snap-align:start;border:2px solid #ff1a1a;border-radius:15px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#111;}
 video{width:100%;height:auto;max-height:60vh;object-fit:cover;border-radius:12px;}
 .info{width:95%;padding:10px;color:#fff;text-align:left;}
-.username{font-weight:800;font-size:18px;cursor:pointer;color:#ff4d4f;}
+.username{font-weight:900;font-size:20px;cursor:pointer;color:#ff4d4f;}
 .username:hover{text-decoration:underline;}
-.follow-btn{background:#ff1a1a;color:#fff;padding:4px 10px;margin-left:8px;border-radius:12px;font-size:12px;cursor:pointer;}
+.follow-btn{background:#ff1a1a;color:#fff;padding:6px 12px;margin-left:10px;border-radius:15px;font-size:14px;cursor:pointer;}
 .createdAt{color:#aaa;font-size:12px;margin-left:5px;}
-.title{font-size:16px;margin-top:5px;font-weight:600;}
-.stats{display:flex;justify-content:flex-start;gap:15px;margin-top:8px;}
-.stat-btn{background:rgba(0,0,0,.6);padding:8px 12px;border-radius:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:6px;font-size:14px;}
+.title{font-size:18px;margin-top:5px;font-weight:700;}
+.stats{display:flex;justify-content:flex-start;gap:20px;margin-top:10px;}
+.stat-btn{background:rgba(0,0,0,.7);padding:10px 15px;border-radius:25px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:8px;font-size:16px;}
 .stat-btn span{color:#fff;}
 .comment-modal{position:fixed;bottom:0;width:100%;height:60%;background:#111;display:none;flex-direction:column;border-top:3px solid #ff0000;z-index:50;}
 .comment-list{flex:1;overflow-y:auto;padding:15px;}
@@ -54,6 +54,11 @@ video{width:100%;height:auto;max-height:60vh;object-fit:cover;border-radius:12px
       <button class="btn login-btn">Login</button>
       <button class="btn upload-btn disabled">Upload</button>
     </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-feed="foryou">For You</div>
+    <div class="tab" data-feed="latest">Latest</div>
+    <div class="tab" data-feed="viral">Viral</div>
   </div>
 </div>
 
@@ -110,10 +115,13 @@ async function initUser(){
 }
 initUser()
 
-async function fetchVideos(){
-  const { data: videos, error } = await supabase.from("videos").select("*").order("created_at",{ascending:false})
+async function fetchVideos(type="foryou"){
+  let query = supabase.from("videos").select("*")
+  if(type==="latest") query = query.order("created_at",{ascending:false})
+  if(type==="viral") query = query.order("views",{ascending:false})
+  const { data, error } = await query
   if(error){ console.error(error); return }
-  renderVideos(videos)
+  renderVideos(data)
 }
 
 async function getCounts(videoId){
@@ -195,6 +203,15 @@ async function followUser(uid){
   await supabase.from('followers').upsert({ follower_id: currentUser.id, following_id: uid }, { onConflict:['follower_id','following_id'] })
   alert('Following!')
 }
+
+// Tabs
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
+    tab.classList.add("active")
+    fetchVideos(tab.dataset.feed)
+  }
+})
 
 // Search
 document.querySelector(".search").onclick=()=>{ document.querySelector(".search-bar").style.display="block" }
