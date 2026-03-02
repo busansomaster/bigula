@@ -7,9 +7,9 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:#000;color:#fff;overflow:hidden;}
-.topbar{position:fixed;top:0;width:100%;height:85px;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;}
-.logo{text-align:center;font-size:32px;font-weight:900;letter-spacing:4px;color:#ff0000;text-shadow:0 0 20px rgba(255,0,0,.8);margin-top:5px;}
-.top-row{display:flex;justify-content:space-between;align-items:center;padding:5px 15px;}
+.topbar{position:fixed;top:0;width:100%;height:85px;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;padding:0 15px;}
+.logo{font-size:32px;font-weight:900;letter-spacing:4px;color:#ff0000;text-shadow:0 0 20px rgba(255,0,0,.8);line-height:85px;display:inline-block;}
+.top-row{display:flex;justify-content:space-between;align-items:center;height:85px;}
 .tabs{display:flex;gap:25px;}
 .tab{cursor:pointer;font-weight:700;opacity:.6;transition:.3s;}
 .tab.active{opacity:1;color:#ff0000;border-bottom:3px solid #ff0000;padding-bottom:4px;}
@@ -18,23 +18,26 @@ body{background:#000;color:#fff;overflow:hidden;}
 .login-btn{background:#fff;color:#000;}
 .upload-btn{background:#ff0000;color:#fff;}
 .upload-btn.disabled{opacity:.4;cursor:not-allowed;}
-.search{font-size:22px;cursor:pointer;color:#ff0000;}
+.search{font-size:22px;cursor:pointer;color:#ff0000;margin-left:10px;}
 .search-bar{position:fixed;top:85px;width:100%;background:#111;padding:10px 15px;display:none;z-index:19;border-bottom:1px solid #222;}
-.search-bar input{width:100%;padding:12px;border-radius:40px;border:1px solid #333;background:#000;color:#fff;}
-.feed{position:absolute;top:85px;bottom:70px;width:100%;overflow-y:scroll;scroll-snap-type:y mandatory;}
-.video-card{height:100vh;width:100%;position:relative;scroll-snap-align:start;display:flex;justify-content:center;align-items:center;}
-video{width:100%;height:100%;object-fit:cover;}
-.info{position:absolute;bottom:120px;left:15px;max-width:70%;}
-.username{font-weight:800;font-size:16px;cursor:pointer;}
+.search-bar input{width:100%;padding:12px;border-radius:40px;border:1px solid #333;background:#000;color:#fff;font-size:16px;}
+.feed{position:absolute;top:125px;bottom:70px;width:100%;overflow-y:scroll;scroll-snap-type:y mandatory;}
+.video-card{height:90vh;width:90%;max-width:600px;margin:15px auto;position:relative;scroll-snap-align:start;border:2px solid #ff1a1a;border-radius:15px;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-direction:column;}
+video{width:100%;height:auto;max-height:60vh;object-fit:cover;border-radius:12px;}
+.info{width:95%;padding:10px;color:#fff;text-align:left;}
+.username{font-weight:800;font-size:18px;cursor:pointer;color:#ff4d4f;}
+.username:hover{text-decoration:underline;}
+.follow-btn{background:#ff1a1a;color:#fff;padding:4px 10px;margin-left:8px;border-radius:12px;font-size:12px;cursor:pointer;}
 .createdAt{color:#aaa;font-size:12px;margin-left:5px;}
-.stats{position:absolute;right:15px;bottom:150px;display:flex;flex-direction:column;gap:20px;text-align:center;}
-.stat-btn{background:rgba(0,0,0,.6);padding:10px;border-radius:50px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;flex-direction:column;}
-.stat-btn span{font-size:12px;color:#fff;}
+.title{font-size:16px;margin-top:5px;font-weight:600;}
+.stats{display:flex;justify-content:flex-start;gap:15px;margin-top:8px;}
+.stat-btn{background:rgba(0,0,0,.6);padding:8px 12px;border-radius:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:6px;font-size:14px;}
+.stat-btn span{color:#fff;}
 .comment-modal{position:fixed;bottom:0;width:100%;height:60%;background:#111;display:none;flex-direction:column;border-top:3px solid #ff0000;z-index:50;}
 .comment-list{flex:1;overflow-y:auto;padding:15px;}
 .comment-input{display:flex;border-top:1px solid #333;}
-.comment-input input{flex:1;padding:12px;background:#000;border:none;color:#fff;}
-.comment-input button{background:#ff0000;border:none;padding:12px 20px;color:#fff;font-weight:bold;cursor:pointer;}
+.comment-input input{flex:1;padding:12px;background:#000;border:none;color:#fff;font-size:16px;}
+.comment-input button{background:#ff0000;border:none;padding:12px 20px;color:#fff;font-weight:bold;cursor:pointer;font-size:16px;}
 .footer{position:fixed;bottom:0;width:100%;height:70px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;font-size:24px;}
 .footer div{cursor:pointer;transition:.3s;}
 .footer div.disabled{opacity:.4;pointer-events:none;}
@@ -44,13 +47,8 @@ video{width:100%;height:100%;object-fit:cover;}
 <body>
 
 <div class="topbar">
-  <div class="logo">BIGULA</div>
   <div class="top-row">
-    <div class="tabs">
-      <div class="tab active" data-feed="foryou">For You</div>
-      <div class="tab" data-feed="latest">Latest</div>
-      <div class="tab" data-feed="viral">Viral</div>
-    </div>
+    <div class="logo">BIGULA</div>
     <div class="actions">
       <div class="search">🔍</div>
       <button class="btn login-btn">Login</button>
@@ -89,7 +87,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null;
 let currentVideoId = null;
 
-// Check auth
 async function initUser(){
   const { data: { user } } = await supabase.auth.getUser()
   currentUser = user
@@ -113,35 +110,38 @@ async function initUser(){
 }
 initUser()
 
-// Fetch videos
-async function fetchVideos(type="foryou"){
-  let queryBuilder = supabase.from("videos").select("*")
-  if(type==="latest") queryBuilder=queryBuilder.order("created_at",{ascending:false})
-  if(type==="viral") queryBuilder=queryBuilder.order("views",{ascending:false})
-  const { data, error } = await queryBuilder
+async function fetchVideos(){
+  const { data: videos, error } = await supabase.from("videos").select("*").order("created_at",{ascending:false})
   if(error){ console.error(error); return }
-  if(data) renderVideos(data)
+  renderVideos(videos)
 }
 
-// Render feed
+async function getCounts(videoId){
+  const { count: likes } = await supabase.from("likes").select("*",{head:true}).eq("video_id",videoId)
+  const { count: comments } = await supabase.from("comments").select("*",{head:true}).eq("video_id",videoId)
+  return { likes, comments }
+}
+
 function renderVideos(videos){
-  const feed=document.getElementById("feed")
+  const feed = document.getElementById("feed")
   feed.innerHTML=""
-  videos.forEach(video=>{
-    const card=document.createElement("div")
+  videos.forEach(async video=>{
+    const counts = await getCounts(video.id)
+    const card = document.createElement("div")
     card.className="video-card"
     card.innerHTML=`
-      <video src="${video.video_url}" muted loop playsinline></video>
+      <video src="${video.video_url}" muted autoplay loop playsinline></video>
       <div class="info">
         <div>
-          <span class="username" onclick="openProfile('${video.user_id}')">@${video.username}</span>
+          <span class="username" onclick="openProfile('${video.creator_id}')">@${video.username||'user'}</span>
+          <button class="follow-btn" onclick="followUser('${video.creator_id}')">+</button>
           <span class="createdAt">${new Date(video.created_at).toLocaleString()}</span>
         </div>
         <div class="title">${video.title||''}</div>
-      </div>
-      <div class="stats">
-        <div class="stat-btn" onclick="likeVideo('${video.id}')">❤️ <span id="like-${video.id}">${video.likes||0}</span></div>
-        <div class="stat-btn" onclick="openComments('${video.id}')">💬 <span id="commentCount-${video.id}">${video.comment_count||0}</span></div>
+        <div class="stats">
+          <div class="stat-btn" onclick="likeVideo('${video.id}')">❤️ <span id="like-${video.id}">${counts.likes||0}</span></div>
+          <div class="stat-btn" onclick="openComments('${video.id}')">💬 <span id="commentCount-${video.id}">${counts.comments||0}</span></div>
+        </div>
       </div>
     `
     feed.appendChild(card)
@@ -149,29 +149,23 @@ function renderVideos(videos){
   setupAutoplay()
 }
 
-// Autoplay videos
 function setupAutoplay(){
   const vids=document.querySelectorAll("video")
   const observer=new IntersectionObserver(entries=>{
-    entries.forEach(e=> e.isIntersecting ? e.target.play() : e.target.pause() )
-  },{threshold:0.8})
+    entries.forEach(e=> e.isIntersecting ? e.target.play() : e.target.pause())
+  },{threshold:0.75})
   vids.forEach(v=>observer.observe(v))
 }
 
-// Profile
-function openProfile(uid){
-  location.href = `account.html?uid=${uid}`
-}
+function openProfile(uid){ location.href=`account.html?uid=${uid}` }
 
-// Like
 async function likeVideo(videoId){
   if(!currentUser) return location.href='signup.html'
-  const { data, error } = await supabase.from('likes').upsert({ video_id: videoId, user_id: currentUser.id }, { onConflict: ['video_id','user_id'] })
-  const likeCountEl = document.getElementById(`like-${videoId}`)
-  if(likeCountEl) likeCountEl.innerText = parseInt(likeCountEl.innerText||0) + 1
+  await supabase.from('likes').upsert({ video_id: videoId, user_id: currentUser.id }, { onConflict: ['video_id','user_id'] })
+  const likeEl = document.getElementById(`like-${videoId}`)
+  if(likeEl) likeEl.innerText = parseInt(likeEl.innerText||0)+1
 }
 
-// Comments
 async function openComments(videoId){
   if(!currentUser) return location.href='signup.html'
   currentVideoId = videoId
@@ -179,10 +173,10 @@ async function openComments(videoId){
   const list = document.getElementById("commentList")
   list.innerHTML=""
   modal.style.display="flex"
-  const { data, error } = await supabase.from("comments").select("*").eq("video_id",videoId).order("created_at",{ascending:true})
-  if(data) data.forEach(c=>{
+  const { data: comments } = await supabase.from("comments").select("*").eq("video_id",videoId).order("created_at",{ascending:true})
+  if(comments) comments.forEach(c=>{
     const div = document.createElement("div")
-    div.innerHTML = `<strong>${c.username}</strong>: ${c.text}`
+    div.innerHTML=`<strong>${c.username}</strong>: ${c.text}`
     list.appendChild(div)
   })
 }
@@ -192,27 +186,22 @@ document.getElementById("postCommentBtn").onclick = async ()=>{
   const text = document.getElementById("commentText").value
   if(!text) return
   await supabase.from("comments").insert({ video_id: currentVideoId, user_id: currentUser.id, username: currentUser.email.split("@")[0], text })
-  document.getElementById("commentText").value = ''
+  document.getElementById("commentText").value=''
   openComments(currentVideoId)
 }
 
-// Tabs
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.onclick=()=>{
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
-    tab.classList.add("active")
-    fetchVideos(tab.dataset.feed)
-  }
-})
+async function followUser(uid){
+  if(!currentUser) return location.href='signup.html'
+  await supabase.from('followers').upsert({ follower_id: currentUser.id, following_id: uid }, { onConflict:['follower_id','following_id'] })
+  alert('Following!')
+}
 
 // Search
-document.querySelector(".search").onclick=()=>{
-  document.querySelector(".search-bar").style.display="block"
-}
+document.querySelector(".search").onclick=()=>{ document.querySelector(".search-bar").style.display="block" }
 document.getElementById("searchInput").addEventListener("input",e=>{
   const term=e.target.value.toLowerCase()
   document.querySelectorAll(".video-card").forEach(card=>{
-    card.style.display=card.innerText.toLowerCase().includes(term)?"flex":"none"
+    card.style.display = card.innerText.toLowerCase().includes(term) ? "flex" : "none"
   })
 })
 
