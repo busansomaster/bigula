@@ -201,8 +201,7 @@ function setupVideoAutoScroll(card){
   const video = card.querySelector("video")
   video.addEventListener("ended", ()=>{
     const next = card.nextElementSibling
-    - if(next) next.scrollIntoView({behavior:"smooth"})
-+ if(next) next.scrollIntoView({behavior:"smooth", block:"center"})
+if(next) next.scrollIntoView({behavior:"smooth", block:"center"})
   })
 }
 
