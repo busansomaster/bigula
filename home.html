@@ -232,7 +232,7 @@ async function toggleLike(videoId, btn){
   if(!currentUser) return location.href='signup.html'
   const likeEl = document.getElementById(`like-${videoId}`)
   const { data: exists } = await supabase.from('likes').select("*").eq('video_id', videoId).eq('user_id', currentUser.id)
-  if(exists.length){
+  if(exists && exists.length){
     await supabase.from('likes').delete().eq('video_id', videoId).eq('user_id', currentUser.id)
     likeEl.innerText = parseInt(likeEl.innerText)-1
   } else {
