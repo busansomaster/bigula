@@ -5,299 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIGULA – Home</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-body {
-  background: #000;
-  color: #fff;
-  overflow-y: auto; /* allow scrolling */
-}
-
-.topbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  min-height: 100px;
-  background: linear-gradient(to bottom, #000 80%, transparent);
-  z-index: 20;
-  padding: 10px 15px;
-  display: flex;
-  flex-direction: column;
-}
-
-.logo {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: 4px;
-  color: #ff0000;
-  text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
-  line-height: 40px;
-}
-
-.top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 5px;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap; /* allow buttons to wrap */
-  gap: 10px;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.btn {
-  padding: 8px 16px;
-  border-radius: 25px;
-  border: none;
-  font-weight: 800;
-  cursor: pointer;
-  transition: 0.3s;
-  font-size: 14px;
-  min-width: 80px;
-  white-space: nowrap;
-}
-
-.login-btn {
-  background: #fff;
-  color: #000;
-}
-
-.upload-btn {
-  background: #ff0000;
-  color: #fff;
-}
-
-.upload-btn.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.search {
-  font-size: 24px;
-  cursor: pointer;
-  color: #ff0000;
-  margin-left: 10px;
-}
-
-.search-bar {
-  position: fixed;
-  top: 100px;
-  width: 100%;
-  background: #111;
-  padding: 10px 15px;
-  display: none;
-  z-index: 19;
-  border-bottom: 1px solid #222;
-}
-
-.search-bar input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 40px;
-  border: 1px solid #333;
-  background: #000;
-  color: #fff;
-  font-size: 16px;
-}
-
-.tabs {
-  display: flex;
-  gap: 20px;
-  margin-top: 10px;
-}
-
-.tab {
-  cursor: pointer;
-  font-weight: 700;
-  opacity: 0.6;
-  transition: 0.3s;
-  font-size: 16px;
-}
-
-.tab.active {
-  opacity: 1;
-  color: #ff0000;
-  border-bottom: 2px solid #ff0000;
-  padding-bottom: 2px;
-}
-
-.feed {
-  position: relative;
-  margin-top: 150px;
-  margin-bottom: 70px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-}
-
-.video-card {
-  height: auto;
-  width: 90%;
-  max-width: 600px;
-  margin: 20px auto;
-  position: relative;
-  scroll-snap-align: start;
-  border-radius: 15px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #111;
-  border: 1px solid rgba(255, 26, 26, 0.3); /* subtle red border */
-}
-
-video {
-  width: 100%;
-  height: auto;
-  max-height: 60vh;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-.info {
-  width: 95%;
-  padding: 10px;
-  color: #fff;
-  text-align: left;
-}
-
-.username {
-  font-weight: 900;
-  font-size: 18px;
-  cursor: pointer;
-  color: #ff4d4f;
-}
-
-.username:hover {
-  text-decoration: underline;
-}
-
-.follow-btn {
-  background: #ff1a1a;
-  color: #fff;
-  padding: 5px 10px;
-  margin-left: 10px;
-  border-radius: 15px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.createdAt {
-  color: #aaa;
-  font-size: 12px;
-  margin-left: 5px;
-}
-
-.title {
-  font-size: 16px;
-  margin-top: 5px;
-  font-weight: 700;
-}
-
-.stats {
-  display: flex;
-  justify-content: flex-start;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.stat-btn {
-  background: rgba(0,0,0,0.7);
-  padding: 8px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-}
-
-.stat-btn span {
-  color: #fff;
-}
-
-.comment-modal {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 60%;
-  background: #111;
-  display: none;
-  flex-direction: column;
-  border-top: 3px solid #ff0000;
-  z-index: 50;
-}
-
-.comment-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 15px;
-}
-
-.comment-input {
-  display: flex;
-  border-top: 1px solid #333;
-}
-
-.comment-input input {
-  flex: 1;
-  padding: 12px;
-  background: #000;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-}
-
-.comment-input button {
-  background: #ff0000;
-  border: none;
-  padding: 12px 20px;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 70px;
-  background: #000;
-  border-top: 1px solid #222;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  font-size: 24px;
-}
-
-.footer div {
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.footer div.disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.footer div:hover:not(.disabled) {
-  color: #ff0000;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:#000;color:#fff;overflow-y:auto;}
+.topbar{position:fixed;top:0;width:100%;min-height:100px;background:linear-gradient(to bottom,#000 80%,transparent);z-index:20;padding:10px 15px;display:flex;flex-direction:column;}
+.logo{font-size:32px;font-weight:900;letter-spacing:4px;color:#ff0000;text-shadow:0 0 20px rgba(255,0,0,.8);line-height:40px;}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-top:5px;}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:flex-end;}
+.btn{padding:8px 16px;border-radius:25px;border:none;font-weight:800;cursor:pointer;transition:.3s;font-size:14px;min-width:80px;white-space:nowrap;}
+.login-btn{background:#fff;color:#000;}
+.upload-btn{background:#ff0000;color:#fff;}
+.upload-btn.disabled{opacity:.4;cursor:not-allowed;}
+#installBtn{background:#00cc00;color:#000;}
+.search{font-size:24px;cursor:pointer;color:#ff0000;margin-left:10px;}
+.search-bar{position:fixed;top:100px;width:100%;background:#111;padding:10px 15px;display:none;z-index:19;border-bottom:1px solid #222;}
+.search-bar input{width:100%;padding:12px;border-radius:40px;border:1px solid #333;background:#000;color:#fff;font-size:16px;}
+.tabs{display:flex;gap:20px;margin-top:10px;}
+.tab{cursor:pointer;font-weight:700;opacity:.6;transition:.3s;font-size:16px;}
+.tab.active{opacity:1;color:#ff0000;border-bottom:2px solid #ff0000;padding-bottom:2px;}
+.feed{position:relative;margin-top:150px;margin-bottom:70px;width:100%;display:flex;flex-direction:column;align-items:center;overflow-y:auto;scroll-snap-type:y mandatory;}
+.video-card{width:100%;height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;background:#111;}
+video{width:100%;height:100%;object-fit:cover;}
+.info{width:95%;padding:10px;color:#fff;text-align:left;}
+.username{font-weight:900;font-size:18px;cursor:pointer;color:#ff4d4f;}
+.username:hover{text-decoration:underline;}
+.follow-btn{background:#ff1a1a;color:#fff;padding:5px 10px;margin-left:10px;border-radius:15px;font-size:14px;cursor:pointer;}
+.createdAt{color:#aaa;font-size:12px;margin-left:5px;}
+.title{font-size:16px;margin-top:5px;font-weight:700;}
+.stats{display:flex;justify-content:flex-start;gap:15px;margin-top:10px;}
+.stat-btn{background:rgba(0,0,0,0.7);padding:8px 12px;border-radius:20px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:6px;font-size:14px;}
+.stat-btn span{color:#fff;}
+.comment-modal{position:fixed;bottom:0;width:100%;height:60%;background:#111;display:none;flex-direction:column;border-top:3px solid #ff0000;z-index:50;}
+.comment-list{flex:1;overflow-y:auto;padding:15px;}
+.comment-input{display:flex;border-top:1px solid #333;}
+.comment-input input{flex:1;padding:12px;background:#000;border:none;color:#fff;font-size:16px;}
+.comment-input button{background:#ff0000;border:none;padding:12px 20px;color:#fff;font-weight:bold;cursor:pointer;font-size:16px;}
+.footer{position:fixed;bottom:0;width:100%;height:70px;background:#000;border-top:1px solid #222;display:flex;justify-content:space-around;align-items:center;font-size:24px;}
+.footer div{cursor:pointer;transition:.3s;}
+.footer div.disabled{opacity:.4;pointer-events:none;}
+.footer div:hover:not(.disabled){color:#ff0000;}
 </style>
 </head>
 <body>
@@ -309,6 +54,7 @@ video {
       <div class="search">🔍</div>
       <button class="btn login-btn">Login</button>
       <button class="btn upload-btn disabled">Upload</button>
+      <button class="btn" id="installBtn">Install App</button>
     </div>
   </div>
   <div class="tabs">
@@ -371,6 +117,7 @@ async function initUser(){
 }
 initUser()
 
+// --- Fetch videos ---
 async function fetchVideos(type="foryou"){
   let query = supabase.from("videos").select("*")
   if(type==="latest") query = query.order("created_at",{ascending:false})
@@ -384,16 +131,18 @@ async function fetchVideos(type="foryou"){
   renderVideos(data)
 }
 
+// --- Count likes/comments ---
 async function getCounts(videoId){
   const { count: likes } = await supabase.from("likes").select("*",{head:true}).eq("video_id",videoId)
   const { count: comments } = await supabase.from("comments").select("*",{head:true}).eq("video_id",videoId)
   return { likes, comments }
 }
 
-function renderVideos(videos){
+// --- Render videos with for...of to avoid duplicates ---
+async function renderVideos(videos){
   const feed = document.getElementById("feed")
   feed.innerHTML=""
-  videos.forEach(async video=>{
+  for(const video of videos){
     const counts = await getCounts(video.id)
     const card = document.createElement("div")
     card.className="video-card"
@@ -413,10 +162,11 @@ function renderVideos(videos){
       </div>
     `
     feed.appendChild(card)
-  })
+  }
   setupAutoplay()
 }
 
+// --- Intersection Observer for autoplay ---
 function setupAutoplay(){
   const vids=document.querySelectorAll("video")
   const observer=new IntersectionObserver(entries=>{entries.forEach(e=> e.isIntersecting ? e.target.play() : e.target.pause())},{threshold:0.75})
@@ -424,63 +174,39 @@ function setupAutoplay(){
 }
 
 function openProfile(uid){ location.href=`account.html?uid=${uid}` }
+async function likeVideo(videoId){ if(!currentUser) return location.href='signup.html'; await supabase.from('likes').upsert({ video_id: videoId, user_id: currentUser.id }, { onConflict: ['video_id','user_id'] }); const likeEl = document.getElementById(`like-${videoId}`); if(likeEl) likeEl.innerText = parseInt(likeEl.innerText||0)+1; }
+async function openComments(videoId){ if(!currentUser) return location.href='signup.html'; currentVideoId = videoId; const modal = document.getElementById("commentModal"); const list = document.getElementById("commentList"); list.innerHTML=""; modal.style.display="flex"; const { data: comments } = await supabase.from("comments").select("*").eq("video_id",videoId).order("created_at",{ascending:true}); if(comments) comments.forEach(c=>{ const div = document.createElement("div"); div.innerHTML=`<strong>${c.username}</strong>: ${c.text}`; list.appendChild(div); }); }
+document.getElementById("postCommentBtn").onclick = async ()=>{ if(!currentUser || !currentVideoId) return location.href='signup.html'; const text = document.getElementById("commentText").value; if(!text) return; await supabase.from("comments").insert({ video_id: currentVideoId, user_id: currentUser.id, username: currentUser.email.split("@")[0], text }); document.getElementById("commentText").value=''; openComments(currentVideoId); }
+async function followUser(uid){ if(!currentUser) return location.href='signup.html'; await supabase.from('followers').upsert({ follower_id: currentUser.id, following_id: uid }, { onConflict:['follower_id','following_id'] }); alert('Following!'); }
 
-async function likeVideo(videoId){
-  if(!currentUser) return location.href='signup.html'
-  await supabase.from('likes').upsert({ video_id: videoId, user_id: currentUser.id }, { onConflict: ['video_id','user_id'] })
-  const likeEl = document.getElementById(`like-${videoId}`)
-  if(likeEl) likeEl.innerText = parseInt(likeEl.innerText||0)+1
-}
+// --- Tabs ---
+document.querySelectorAll(".tab").forEach(tab=>{tab.onclick=()=>{document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active")); tab.classList.add("active"); fetchVideos(tab.dataset.feed); }});
 
-async function openComments(videoId){
-  if(!currentUser) return location.href='signup.html'
-  currentVideoId = videoId
-  const modal = document.getElementById("commentModal")
-  const list = document.getElementById("commentList")
-  list.innerHTML=""
-  modal.style.display="flex"
-  const { data: comments } = await supabase.from("comments").select("*").eq("video_id",videoId).order("created_at",{ascending:true})
-  if(comments) comments.forEach(c=>{
-    const div = document.createElement("div")
-    div.innerHTML=`<strong>${c.username}</strong>: ${c.text}`
-    list.appendChild(div)
-  })
-}
-
-document.getElementById("postCommentBtn").onclick = async ()=>{
-  if(!currentUser || !currentVideoId) return location.href='signup.html'
-  const text = document.getElementById("commentText").value
-  if(!text) return
-  await supabase.from("comments").insert({ video_id: currentVideoId, user_id: currentUser.id, username: currentUser.email.split("@")[0], text })
-  document.getElementById("commentText").value=''
-  openComments(currentVideoId)
-}
-
-async function followUser(uid){
-  if(!currentUser) return location.href='signup.html'
-  await supabase.from('followers').upsert({ follower_id: currentUser.id, following_id: uid }, { onConflict:['follower_id','following_id'] })
-  alert('Following!')
-}
-
-// Tabs
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.onclick=()=>{
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
-    tab.classList.add("active")
-    fetchVideos(tab.dataset.feed)
-  }
-})
-
-// Search
+// --- Search ---
 document.querySelector(".search").onclick=()=>{ document.querySelector(".search-bar").style.display="block" }
 document.getElementById("searchInput").addEventListener("input",e=>{
   const term=e.target.value.toLowerCase()
-  document.querySelectorAll(".video-card").forEach(card=>{
-    card.style.display = card.innerText.toLowerCase().includes(term) ? "flex" : "none"
-  })
+  document.querySelectorAll(".video-card").forEach(card=>{ card.style.display = card.innerText.toLowerCase().includes(term) ? "flex" : "none" })
 })
 
 fetchVideos()
+
+// --- Install App ---
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+installBtn.style.display = 'none';
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = 'inline-block';
+});
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.style.display = 'none';
+});
 </script>
 </body>
 </html>
