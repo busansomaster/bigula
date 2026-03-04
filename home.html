@@ -182,14 +182,11 @@ function setupAutoplay(){
   const topbar = document.getElementById("topbar")
   const observer=new IntersectionObserver(entries=>{
     entries.forEach(e=>{
-    - if(e.isIntersecting){
--   e.target.muted = false
--   e.target.play()
-- } else e.target.pause()
-+ if(e.isIntersecting){
-+   e.target.volume = 1
-+   e.target.play()
-+ } else e.target.pause()
+
+ if(e.isIntersecting){
+  e.target.volume = 1
+   e.target.play()
+ } else e.target.pause()
         topbar.style.top="0"
       }
     })
