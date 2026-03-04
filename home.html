@@ -149,7 +149,7 @@ async function renderVideos(videos){
     const card = document.createElement("div")
     card.className="video-card"
     card.innerHTML=`
-      <video src="${video.video_url}" autoplay playsinline muted></video>
+      <video src="${video.video_url}" autoplay playsinline></video>
       <div class="meta-overlay">
         <div class="user-row">
           <span class="username" onclick="openProfile('${video.creator_id}')">@${video.username||'user'}</span>
@@ -182,12 +182,14 @@ function setupAutoplay(){
   const topbar = document.getElementById("topbar")
   const observer=new IntersectionObserver(entries=>{
     entries.forEach(e=>{
-      if(e.isIntersecting){
-        e.target.muted = false
-        e.target.play()
-        topbar.style.top="-120px" // hide topbar
-      } else {
-        e.target.pause()
+    - if(e.isIntersecting){
+-   e.target.muted = false
+-   e.target.play()
+- } else e.target.pause()
++ if(e.isIntersecting){
++   e.target.volume = 1
++   e.target.play()
++ } else e.target.pause()
         topbar.style.top="0"
       }
     })
@@ -199,7 +201,8 @@ function setupVideoAutoScroll(card){
   const video = card.querySelector("video")
   video.addEventListener("ended", ()=>{
     const next = card.nextElementSibling
-    if(next) next.scrollIntoView({behavior:"smooth"})
+    - if(next) next.scrollIntoView({behavior:"smooth"})
++ if(next) next.scrollIntoView({behavior:"smooth", block:"center"})
   })
 }
 
