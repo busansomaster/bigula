@@ -188,7 +188,13 @@ function setupAutoplay(){
       if(entry.isIntersecting){
         video.volume = 1
         video.play()
-
+  // register view
+  if(currentUser){
+    supabase.from("views").insert({
+      video_id: video.closest(".video-card").dataset.id,
+      user_id: currentUser.id
+    })
+  }
         // hide header while video is active
         topbar.style.top = "-120px"
       } else {
