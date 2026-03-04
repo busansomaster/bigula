@@ -22,16 +22,16 @@ body{background:#000;color:#fff;overflow-y:auto;}
 .tabs{display:flex;gap:20px;margin-top:10px;}
 .tab{cursor:pointer;font-weight:700;opacity:.6;transition:.3s;font-size:16px;}
 .tab.active{opacity:1;color:#ff0000;border-bottom:2px solid #ff0000;padding-bottom:2px;}
-.feed{margin-top:150px;margin-bottom:70px;width:100%;display:flex;flex-direction:column;align-items:center;overflow-y:auto;scroll-snap-type:y mandatory;}
-.video-card{width:100%;height:100vh;scroll-snap-align:start;position:relative;display:flex;align-items:flex-end;justify-content:flex-start;background:#111;}
-video{width:100%;height:100%;object-fit:cover;}
-.meta-overlay{position:absolute;bottom:20px;left:15px;color:#fff;z-index:10;width:90%;display:flex;flex-direction:column;gap:10px;text-shadow:0 0 8px rgba(0,0,0,0.7);}
-.user-row{display:flex;align-items:center;gap:10px;}
-.username{font-weight:900;font-size:18px;cursor:pointer;color:#ff4d4f;}
+.feed{margin-top:150px;margin-bottom:70px;width:100%;display:flex;flex-direction:column;align-items:center;overflow-y:auto;scroll-snap-type:y mandatory;gap:15px;}
+.video-card{width:95%;max-width:500px;background:#111;border-radius:15px;overflow:hidden;display:flex;flex-direction:column;scroll-snap-align:start;position:relative;}
+video{width:100%;height:auto;max-height:300px;object-fit:cover;display:block;}
+.meta-overlay{padding:10px;display:flex;flex-direction:column;gap:8px;}
+.user-row{display:flex;align-items:center;gap:10px;justify-content:space-between;}
+.username{font-weight:900;font-size:16px;cursor:pointer;color:#ff4d4f;}
 .follow-btn{background:#ff1a1a;color:#fff;padding:5px 12px;border-radius:15px;font-size:14px;cursor:pointer;font-weight:700;}
-.title{font-size:18px;font-weight:700;}
+.title{font-size:16px;font-weight:700;}
 .stats{display:flex;gap:15px;margin-top:5px;}
-.stat-btn{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:20px;cursor:pointer;font-weight:700;}
+.stat-btn{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.5);padding:6px 10px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;}
 .stat-btn span{color:#fff;}
 .comment-modal{position:fixed;bottom:0;width:100%;height:60%;background:#111;display:none;flex-direction:column;border-top:3px solid #ff0000;z-index:50;}
 .comment-list{flex:1;overflow-y:auto;padding:15px;}
@@ -93,7 +93,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null;
 let currentVideoId = null;
 
-// --- User initialization ---
+// --- User ---
 async function initUser(){
   const { data: { user } } = await supabase.auth.getUser()
   currentUser = user
@@ -131,14 +131,14 @@ async function fetchVideos(type="foryou"){
   renderVideos(data)
 }
 
-// --- Count likes/comments ---
+// --- Counts ---
 async function getCounts(videoId){
   const { count: likes } = await supabase.from("likes").select("*",{head:true}).eq("video_id",videoId)
   const { count: comments } = await supabase.from("comments").select("*",{head:true}).eq("video_id",videoId)
   return { likes, comments }
 }
 
-// --- Render videos full-screen TikTok style ---
+// --- Render videos ---
 async function renderVideos(videos){
   const feed = document.getElementById("feed")
   feed.innerHTML=""
@@ -165,7 +165,7 @@ async function renderVideos(videos){
   setupAutoplay()
 }
 
-// --- Autoplay visible video only ---
+// --- Autoplay ---
 function setupAutoplay(){
   const vids = document.querySelectorAll("video")
   const observer = new IntersectionObserver(entries=>{
