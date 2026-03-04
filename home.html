@@ -147,7 +147,8 @@ async function renderVideos(videos){
   for(const video of videos){
     const counts = await getCounts(video.id)
     const card = document.createElement("div")
-    card.className="video-card"
+   card.className="video-card"
+  card.dataset.id = video.id
     card.innerHTML=`
       <video src="${video.video_url}" autoplay playsinline></video>
       <div class="meta-overlay">
