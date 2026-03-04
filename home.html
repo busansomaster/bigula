@@ -178,22 +178,28 @@ async function renderVideos(videos){
 
 // --- Autoplay & hide header ---
 function setupAutoplay(){
-  const vids=document.querySelectorAll("video")
+  const vids = document.querySelectorAll("video")
   const topbar = document.getElementById("topbar")
-  const observer=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
 
- if(e.isIntersecting){
-  e.target.volume = 1
-   e.target.play()
- } else e.target.pause()
-        topbar.style.top="0"
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      const video = entry.target
+
+      if(entry.isIntersecting){
+        video.volume = 1
+        video.play()
+
+        // hide header while video is active
+        topbar.style.top = "-120px"
+      } else {
+        video.pause()
+        topbar.style.top = "0"
       }
     })
-  },{threshold:0.75})
+  }, { threshold: 0.75 })
+
   vids.forEach(v=>observer.observe(v))
 }
-
 function setupVideoAutoScroll(card){
   const video = card.querySelector("video")
   video.addEventListener("ended", ()=>{
