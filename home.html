@@ -217,10 +217,17 @@ if(next) next.scrollIntoView({behavior:"smooth", block:"center"})
 
 // --- Share functions ---
 function toggleShare(btn){
+  document.querySelectorAll(".share-options").forEach(el=>{
+    if(el !== btn.nextElementSibling){
+      el.style.display = "none"
+    }
+  })
+
   const options = btn.nextElementSibling
   if(!options) return
-  options.style.display = options.style.display==="flex" ? "none" : "flex"
-  options.style.flexDirection="column"
+
+  options.style.display = 
+    options.style.display === "flex" ? "none" : "flex"
 }
 
 function shareWhatsApp(url, username){
