@@ -6,60 +6,110 @@
 <title>BIGULA – Sign Up</title>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
 const supabase = createClient(
   'https://uyuofjiiptnbbcuntbfi.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ'
 );
 
-const showMessage = (msg, type='error')=>{
+const showMessage = (msg, type='error') => {
   const m = document.getElementById('message');
   m.textContent = msg;
   m.className = type==='error' ? 'error' : 'success';
   m.style.display='block';
 }
 
+// Switch to selected signup form
+const showForm = (method) => {
+  document.querySelector('.signup-methods').style.display = 'none';
+  document.querySelectorAll('.signup-form').forEach(f => f.style.display='none');
+  if(method==='email') document.getElementById('email-form').style.display='block';
+  if(method==='phone') document.getElementById('phone-form').style.display='block';
+}
+
+// Show profile completion form
+const showProfileForm = () => {
+  document.querySelectorAll('.signup-form').forEach(f => f.style.display='none');
+  document.getElementById('profile-form').style.display='block';
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
-  const signupBtn = document.getElementById('signup-btn');
   const loginRedirect = document.getElementById('login-redirect');
 
-  signupBtn.onclick = async ()=>{
-    document.getElementById('message').style.display='none';
+  // Method buttons
+  document.getElementById('btn-email').onclick = ()=>showForm('email');
+  document.getElementById('btn-phone').onclick = ()=>showForm('phone');
+  document.getElementById('btn-google').onclick = async ()=>{
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options:{ redirectTo: window.location.href }});
+    if(error) showMessage(error.message);
+  }
+
+  // Email signup
+  document.getElementById('signup-email-btn').onclick = async ()=>{
+    showMessage('', 'success');
     const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
+    if(!username || !email || !password) return showMessage("Fill all fields");
 
-    if(!username || !email || !password){
-      return showMessage("Fill all fields");
-    }
-
-    // Signup without email verification
     const { data, error } = await supabase.auth.signUp({
       email, password, options: { data: { username } }
     });
-
     if(error) return showMessage(error.message);
+    await supabase.from('users').upsert([{id:data.user.id, username}]);
 
-    // Automatically logged in
-    const user = data.user;
-    showMessage("Signup successful! Redirecting...", 'success');
-
-    // Optional: Create a profile row
-    await supabase.from('users').upsert([{id:user.id, username}]);
-
-    setTimeout(()=>window.location.href='home.html',1200);
+    showProfileForm();
   }
 
-  loginRedirect.onclick = ()=>{
-    window.location.href='login.html';
+  // Phone signup
+  document.getElementById('signup-phone-btn').onclick = async ()=>{
+    showMessage('', 'success');
+    const username = document.getElementById('phone-username').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('phone-password').value.trim();
+    if(!username || !phone || !password) return showMessage("Fill all fields");
+
+    const { data, error } = await supabase.auth.signUp({ phone, password, options:{ data:{ username } }});
+    if(error) return showMessage(error.message);
+    await supabase.from('users').upsert([{id:data.user.id, username}]);
+
+    showProfileForm();
   }
+
+  // Profile completion
+  document.getElementById('profile-submit-btn').onclick = async ()=>{
+    const user = supabase.auth.getUser ? (await supabase.auth.getUser()).data.user : null;
+    if(!user) return showMessage("User not logged in");
+
+    const bio = document.getElementById('bio').value.trim();
+    const avatarFile = document.getElementById('avatar').files[0];
+    let avatar_url = null;
+
+    if(avatarFile){
+      const { data, error } = await supabase.storage.from('avatars').upload(`${user.id}-${Date.now()}`, avatarFile);
+      if(error) return showMessage(error.message);
+      avatar_url = supabase.storage.from('avatars').getPublicUrl(data.path).publicUrl;
+    }
+
+    await supabase.from('users').update({ bio, avatar_url }).eq('id', user.id);
+
+    window.location.href = 'home.html';
+  }
+
+  // Skip profile
+  document.getElementById('profile-skip-btn').onclick = ()=>{
+    window.location.href = 'home.html';
+  }
+
+  loginRedirect.onclick = ()=>window.location.href='login.html';
 });
 </script>
 
 <style>
-body{background:#121212;color:white;font-family:'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;}
+body{background:#121212;color:white;font-family:'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}
 .container{width:100%;max-width:400px;background:#1f1f2f;padding:30px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);}
 h1{text-align:center;margin-bottom:25px;color:#ff4d4f;}
-input, button{width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:none;font-size:15px;}
+button, input{width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:none;font-size:15px;}
 input{background:#2a2a40;color:white;}
 input:focus{outline:none;border:1px solid #ff4d4f;}
 button{background:#ff4d4f;color:white;cursor:pointer;transition:.3s;font-weight:bold;}
@@ -67,16 +117,47 @@ button:hover{background:#e03a3a;}
 #message{margin-bottom:12px;text-align:center;padding:10px;border-radius:8px;display:none;}
 #message.error{background:#a00;color:white;}
 #message.success{background:#0a0;color:white;}
+.signup-methods button{width:32%; display:inline-block; margin-right:2%;}
+.signup-methods button:last-child{margin-right:0;}
+.signup-form{display:none;}
 </style>
 </head>
 <body>
 <div class="container">
 <h1>BIGULA Sign Up</h1>
 <div id="message"></div>
-<input type="text" id="username" placeholder="Username">
-<input type="email" id="email" placeholder="Email">
-<input type="password" id="password" placeholder="Password">
-<button id="signup-btn">Sign Up</button>
+
+<!-- Signup method selection -->
+<div class="signup-methods">
+  <button id="btn-email">Email</button>
+  <button id="btn-phone">Phone</button>
+  <button id="btn-google">Google</button>
+</div>
+
+<!-- Email Form -->
+<div id="email-form" class="signup-form">
+  <input type="text" id="username" placeholder="Username">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button id="signup-email-btn">Sign Up with Email</button>
+</div>
+
+<!-- Phone Form -->
+<div id="phone-form" class="signup-form">
+  <input type="text" id="phone-username" placeholder="Username">
+  <input type="tel" id="phone" placeholder="Phone Number">
+  <input type="password" id="phone-password" placeholder="Password">
+  <button id="signup-phone-btn">Sign Up with Phone</button>
+</div>
+
+<!-- Profile Completion Form -->
+<div id="profile-form" class="signup-form">
+  <input type="file" id="avatar" accept="image/*">
+  <input type="text" id="bio" placeholder="Write a short bio">
+  <button id="profile-submit-btn">Save Profile</button>
+  <button id="profile-skip-btn" style="background:#444;">Skip</button>
+</div>
+
 <button id="login-redirect" style="background:#444;">Back to Login</button>
 </div>
 </body>
