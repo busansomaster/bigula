@@ -33,8 +33,17 @@ const showProfileForm = () => {
   document.getElementById('profile-form').style.display='block';
 }
 
+// Enable/disable signup buttons based on terms checkbox
+const toggleSignupButtons = () => {
+  const checked = document.getElementById('terms-checkbox').checked;
+  document.getElementById('signup-email-btn').disabled = !checked;
+  document.getElementById('signup-phone-btn').disabled = !checked;
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
   const loginRedirect = document.getElementById('login-redirect');
+
+  document.getElementById('terms-checkbox').addEventListener('change', toggleSignupButtons);
 
   // Method buttons
   document.getElementById('btn-email').onclick = ()=>showForm('email');
@@ -113,13 +122,16 @@ button, input{width:100%;padding:12px;margin-bottom:12px;border-radius:8px;borde
 input{background:#2a2a40;color:white;}
 input:focus{outline:none;border:1px solid #ff4d4f;}
 button{background:#ff4d4f;color:white;cursor:pointer;transition:.3s;font-weight:bold;}
-button:hover{background:#e03a3a;}
+button:hover:not(:disabled){background:#e03a3a;}
+button:disabled{background:#555;cursor:not-allowed;}
 #message{margin-bottom:12px;text-align:center;padding:10px;border-radius:8px;display:none;}
 #message.error{background:#a00;color:white;}
 #message.success{background:#0a0;color:white;}
 .signup-methods button{width:32%; display:inline-block; margin-right:2%;}
 .signup-methods button:last-child{margin-right:0;}
 .signup-form{display:none;}
+.terms-container{font-size:12px;color:#aaa;margin-bottom:12px;}
+.terms-container a{color:#888;text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -139,7 +151,10 @@ button:hover{background:#e03a3a;}
   <input type="text" id="username" placeholder="Username">
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
-  <button id="signup-email-btn">Sign Up with Email</button>
+  <div class="terms-container">
+    <input type="checkbox" id="terms-checkbox"> Clicking signup means you have read and understand <a href="https://uyuofjiiptnbbcuntbfi.supabase.co/storage/v1/object/public/Terms/Terms%20and%20policy.pdf" target="_blank">Bigula's Terms and Policies</a>
+  </div>
+  <button id="signup-email-btn" disabled>Sign Up with Email</button>
 </div>
 
 <!-- Phone Form -->
@@ -147,7 +162,10 @@ button:hover{background:#e03a3a;}
   <input type="text" id="phone-username" placeholder="Username">
   <input type="tel" id="phone" placeholder="Phone Number">
   <input type="password" id="phone-password" placeholder="Password">
-  <button id="signup-phone-btn">Sign Up with Phone</button>
+  <div class="terms-container">
+    <input type="checkbox" id="terms-checkbox"> Clicking signup means you have read and understand <a href="https://uyuofjiiptnbbcuntbfi.supabase.co/storage/v1/object/public/Terms/Terms%20and%20policy.pdf" target="_blank">Bigula's Terms and Policies</a>
+  </div>
+  <button id="signup-phone-btn" disabled>Sign Up with Phone</button>
 </div>
 
 <!-- Profile Completion Form -->
