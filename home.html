@@ -641,9 +641,8 @@ async function renderVideos(videos){
           <span class="username"
             onclick="openProfile('${video.creator_id}')">
             <span class="username"
-  onclick="openProfile('${video.creator_id}')">
+  onclick="location.href='creator-profile.html?uid=${video.creator_id}'">
   @${video.username || 'user'}
-  ${video.is_monetized ? '<span class="gold-badge">🟡</span>' : ''}
 </span>
           </span>
 
@@ -812,7 +811,7 @@ function shareStatus(videoId, username){
 
 function openProfile(uid){
 
-  location.href = `account.html?uid=${uid}`
+  location.href = `creator-profile.html?uid=${uid}`
 }
 
 async function toggleLike(videoId, btn){
