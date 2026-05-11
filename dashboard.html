@@ -3,182 +3,767 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BIGULA - My Dashboard</title>
+
+<title>BIGULA Creator Studio</title>
+
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family: Arial,sans-serif; }
-body { background:#0f0f0f; color:#fff; }
-header { background:#1a1a1a; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
-header h1 { color:#ff0050; font-size:1.6rem; }
-.container { display:flex; width:95%; margin:20px auto; gap:20px; min-height:75vh; }
-.sidebar { width:180px; background:#161616; padding:15px; border-radius:12px; display:flex; flex-direction:column; justify-content:space-between; }
-.sidebar .menu button { width:100%; padding:8px; margin-bottom:8px; font-size:13px; border:none; border-radius:8px; background:#ff0050; color:#fff; cursor:pointer; }
-.sidebar .menu button:hover { background:#e60045; }
-.footer-nav button { width:100%; padding:8px; margin-top:8px; font-size:13px; border:none; border-radius:8px; background:#333; color:#fff; cursor:pointer; }
-.main-content { flex:1; background:#141414; padding:25px; border-radius:12px; overflow-y:auto; }
-.main-content h2 { color:#ff0050; margin-bottom:20px; }
-.video-item { background:#1c1c1c; padding:15px; border-radius:10px; margin-bottom:12px; }
-.video-item p { font-size:14px; margin-bottom:5px; }
-.progress-bar { width:100%; background:#333; height:8px; border-radius:10px; overflow:hidden; margin-top:6px; }
-.progress-fill { height:8px; background:#ff0050; }
-.monetize-btn { margin-top:15px; padding:10px 15px; background:#00c853; border:none; border-radius:8px; color:#fff; cursor:pointer; }
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#0a0a0a;
+  color:#fff;
+}
+
+/* HEADER */
+
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:#111;
+  padding:18px 22px;
+  border-bottom:1px solid #222;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:28px;
+  font-weight:900;
+  color:#ff004f;
+  letter-spacing:2px;
+  text-shadow:0 0 15px rgba(255,0,79,.6);
+}
+
+.header-actions{
+  display:flex;
+  gap:10px;
+}
+
+.header-btn{
+  padding:10px 16px;
+  border:none;
+  border-radius:30px;
+  background:#1f1f1f;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.header-btn:hover{
+  transform:scale(1.05);
+  background:#ff004f;
+}
+
+/* LAYOUT */
+
+.container{
+  width:95%;
+  margin:20px auto;
+  display:flex;
+  gap:20px;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  width:220px;
+  background:#141414;
+  border-radius:20px;
+  padding:18px;
+  height:calc(100vh - 120px);
+  position:sticky;
+  top:95px;
+}
+
+.menu-title{
+  font-size:13px;
+  opacity:.6;
+  margin-bottom:10px;
+  text-transform:uppercase;
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.menu button{
+  background:#1d1d1d;
+  border:none;
+  color:#fff;
+  padding:14px;
+  border-radius:14px;
+  cursor:pointer;
+  text-align:left;
+  font-size:15px;
+  font-weight:700;
+  transition:.25s;
+}
+
+.menu button:hover{
+  background:#ff004f;
+  transform:translateX(4px);
+}
+
+/* MAIN */
+
+.main{
+  flex:1;
+}
+
+/* CREATOR HEADER */
+
+.creator-header{
+  background:linear-gradient(135deg,#1a1a1a,#101010);
+  border:1px solid #222;
+  border-radius:24px;
+  padding:25px;
+  display:flex;
+  gap:20px;
+  align-items:center;
+  margin-bottom:25px;
+}
+
+.avatar{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid gold;
+}
+
+.creator-info h1{
+  font-size:34px;
+  margin-bottom:8px;
+}
+
+.creator-level{
+  display:inline-block;
+  background:gold;
+  color:#000;
+  font-weight:900;
+  padding:6px 12px;
+  border-radius:30px;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+.creator-bio{
+  opacity:.8;
+  margin-bottom:15px;
+}
+
+.creator-stats{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.creator-stats div{
+  background:#1e1e1e;
+  padding:10px 18px;
+  border-radius:18px;
+  text-align:center;
+}
+
+.creator-stats strong{
+  display:block;
+  font-size:20px;
+  color:#ff004f;
+}
+
+/* ANALYTICS */
+
+.analytics-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+  margin-bottom:30px;
+}
+
+.card{
+  background:#141414;
+  border:1px solid #222;
+  border-radius:20px;
+  padding:22px;
+  transition:.25s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:#ff004f;
+}
+
+.card-title{
+  opacity:.7;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+.card-value{
+  font-size:32px;
+  font-weight:900;
+  color:#ff004f;
+}
+
+.card-sub{
+  margin-top:10px;
+  opacity:.7;
+  font-size:13px;
+}
+
+/* MONETIZATION */
+
+.section{
+  background:#141414;
+  border:1px solid #222;
+  border-radius:22px;
+  padding:25px;
+  margin-bottom:25px;
+}
+
+.section h2{
+  margin-bottom:18px;
+  color:#ff004f;
+}
+
+.goal{
+  margin-bottom:18px;
+}
+
+.goal p{
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.progress{
+  width:100%;
+  height:12px;
+  background:#222;
+  border-radius:30px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:12px;
+  background:linear-gradient(90deg,#ff004f,gold);
+}
+
+/* VIDEOS */
+
+.video-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:18px;
+}
+
+.video-card{
+  background:#191919;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid #222;
+  transition:.25s;
+}
+
+.video-card:hover{
+  transform:scale(1.02);
+}
+
+.video-card video{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  background:#000;
+}
+
+.video-info{
+  padding:14px;
+}
+
+.video-info h3{
+  margin-bottom:10px;
+}
+
+.video-metrics{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+  font-size:13px;
+}
+
+.metric{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.metric strong{
+  color:#ff004f;
+}
+
+/* ACHIEVEMENTS */
+
+.badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.badge{
+  background:#1f1f1f;
+  padding:10px 16px;
+  border-radius:40px;
+  border:1px solid #333;
+  font-size:14px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+  .container{
+    flex-direction:column;
+  }
+
+  .sidebar{
+    width:100%;
+    height:auto;
+    position:relative;
+    top:0;
+  }
+
+  .creator-header{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .creator-stats{
+    justify-content:center;
+  }
+}
+
 </style>
 </head>
+
 <body>
 
 <header>
-  <h1>BIGULA Dashboard</h1>
+
+  <div class="logo">
+    BIGULA STUDIO
+  </div>
+
+  <div class="header-actions">
+
+    <button class="header-btn"
+      onclick="location.href='upload.html'">
+      Upload
+    </button>
+
+    <button class="header-btn"
+      onclick="location.href='home.html'">
+      Home
+    </button>
+
+  </div>
+
 </header>
 
 <div class="container">
+
+  <!-- SIDEBAR -->
+
   <div class="sidebar">
+
+    <div class="menu-title">
+      Creator Tools
+    </div>
+
     <div class="menu">
-      <button onclick="showMyVideos()">My Videos</button>
-      <button onclick="showMonetize()">Monetize</button>
-      <button onclick="uploadVideo()">Upload +</button>
-      <button onclick="showFollowing()">Following</button>
-      <button onclick="showFollowers()">Followers</button>
+
+      <button onclick="showDashboard()">
+        📊 Dashboard
+      </button>
+
+      <button onclick="showVideos()">
+        🎥 My Videos
+      </button>
+
+      <button onclick="showAnalytics()">
+        📈 Analytics
+      </button>
+
+      <button onclick="showMonetization()">
+        💰 Monetization
+      </button>
+
+      <button onclick="showFollowers()">
+        👥 Followers
+      </button>
+
+      <button onclick="showAchievements()">
+        🏅 Achievements
+      </button>
+
+      <button onclick="location.href='account.html'">
+        👤 My Account
+      </button>
+
     </div>
-    <div class="footer-nav">
-      <button onclick="location.href='account.html'">My Account</button>
-      <button onclick="location.href='home.html'">Home</button>
-      <button onclick="location.href='inbox.html'">Inbox</button>
-    </div>
+
   </div>
 
-  <div class="main-content" id="mainContent">
-    <h2>Welcome to your dashboard</h2>
-    <p>Select an option from the menu.</p>
+  <!-- MAIN -->
+
+  <div class="main">
+
+    <!-- CREATOR HEADER -->
+
+    <div class="creator-header">
+
+      <img
+        src="https://placehold.co/200x200"
+        class="avatar"
+      >
+
+      <div class="creator-info">
+
+        <h1>
+          @creator 🏅
+        </h1>
+
+        <div class="creator-level">
+          BIGULA Gold Creator
+        </div>
+
+        <div class="creator-bio">
+          Comedy • Lifestyle • Uganda
+        </div>
+
+        <div class="creator-stats">
+
+          <div>
+            <strong id="followersCount">
+              0
+            </strong>
+            Followers
+          </div>
+
+          <div>
+            <strong id="likesCount">
+              0
+            </strong>
+            Likes
+          </div>
+
+          <div>
+            <strong id="earningsCount">
+              $0
+            </strong>
+            Earnings
+          </div>
+
+          <div>
+            <strong id="viewsCount">
+              0
+            </strong>
+            Views
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ANALYTICS -->
+
+    <div class="analytics-grid">
+
+      <div class="card">
+        <div class="card-title">
+          Today's Views
+        </div>
+
+        <div class="card-value" id="todayViews">
+          0
+        </div>
+
+        <div class="card-sub">
+          +12% from yesterday
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          Watch Time
+        </div>
+
+        <div class="card-value">
+          0h
+        </div>
+
+        <div class="card-sub">
+          Total audience retention
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          RPM
+        </div>
+
+        <div class="card-value">
+          $0.00
+        </div>
+
+        <div class="card-sub">
+          Revenue per 1000 views
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          Monetization Status
+        </div>
+
+        <div class="card-value">
+          Pending
+        </div>
+
+        <div class="card-sub">
+          Complete verification
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MONETIZATION -->
+
+    <div class="section">
+
+      <h2>
+        Monetization Progress
+      </h2>
+
+      <div class="goal">
+
+        <p>
+          Followers: 320 / 1000
+        </p>
+
+        <div class="progress">
+          <div class="progress-fill"
+            style="width:32%">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="goal">
+
+        <p>
+          Likes: 1400 / 2000
+        </p>
+
+        <div class="progress">
+          <div class="progress-fill"
+            style="width:70%">
+          </div>
+        </div>
+
+      </div>
+
+      <button class="header-btn">
+        Apply for Monetization
+      </button>
+
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+
+    <div class="section">
+
+      <h2>
+        Creator Achievements
+      </h2>
+
+      <div class="badges">
+
+        <div class="badge">
+          🎥 First Upload
+        </div>
+
+        <div class="badge">
+          🔥 10K Views
+        </div>
+
+        <div class="badge">
+          💰 First Dollar
+        </div>
+
+        <div class="badge">
+          👑 Viral Creator
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- VIDEOS -->
+
+    <div class="section">
+
+      <h2>
+        Your Videos
+      </h2>
+
+      <div class="video-grid"
+        id="videoGrid">
+
+      </div>
+
+    </div>
+
   </div>
+
 </div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+import { createClient }
+from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const SUPABASE_URL = "https://uyuofjiiptnbbcuntbfi.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dW9mamlpcHRuYmJjdW50YmZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzQ3MjcsImV4cCI6MjA4NzkxMDcyN30.-FBKM7NKTSm20qzkExueYhqrE6oaK6a6de1qCsl2nuQ";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let currentUser = null;
+let currentUser = null
 
-// Initialize user
-async function initUser() {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if(error || !user) {
-    location.href = "login.html";
-    return;
+async function init(){
+
+  const {
+    data:{ user }
+  } = await supabase.auth.getUser()
+
+  if(!user){
+    location.href = "login.html"
+    return
   }
-  currentUser = user;
+
+  currentUser = user
+
+  loadVideos()
 }
 
-initUser();
+init()
 
-function uploadVideo() {
-  location.href = "upload.html";
+async function loadVideos(){
+
+  const {
+    data:videos
+  } = await supabase
+  .from("videos")
+  .select("*")
+  .eq("creator_id", currentUser.id)
+  .order("created_at",{ascending:false})
+
+  const grid =
+    document.getElementById("videoGrid")
+
+  grid.innerHTML = ""
+
+  videos.forEach(video=>{
+
+    const card =
+      document.createElement("div")
+
+    card.className = "video-card"
+
+    card.innerHTML = `
+
+      <video
+        src="${video.video_url}"
+        muted
+        loop
+        playsinline>
+      </video>
+
+      <div class="video-info">
+
+        <h3>
+          ${video.title || 'Untitled'}
+        </h3>
+
+        <div class="video-metrics">
+
+          <div class="metric">
+            <strong>${video.views || 0}</strong>
+            <span>Views</span>
+          </div>
+
+          <div class="metric">
+            <strong>${video.likes || 0}</strong>
+            <span>Likes</span>
+          </div>
+
+          <div class="metric">
+            <strong>$0.00</strong>
+            <span>Earned</span>
+          </div>
+
+        </div>
+
+      </div>
+    `
+
+    grid.appendChild(card)
+  })
+
+  setupAutoplay()
 }
 
-// -----------------
-// My Videos
-// -----------------
-window.showMyVideos = async function() {
-  const main = document.getElementById("mainContent");
-  main.innerHTML = "<h2>My Videos</h2>";
+function setupAutoplay(){
 
-  if(!currentUser) return main.innerHTML += "<p>Please login.</p>";
+  const videos =
+    document.querySelectorAll("video")
 
-  const { data: videos, error } = await supabase
-    .from('videos')
-    .select('*')
-    .eq('creator_id', currentUser.id)
-    .order('created_at', { ascending: false });
+  const observer =
+    new IntersectionObserver(entries=>{
 
-  if(error) return main.innerHTML += `<p>Error: ${error.message}</p>`;
+      entries.forEach(entry=>{
 
-  if(videos.length === 0) return main.innerHTML += "<p>No videos uploaded yet.</p>";
+        if(entry.isIntersecting){
+          entry.target.play()
+        } else {
+          entry.target.pause()
+        }
+      })
 
-  videos.forEach(video => {
-    const div = document.createElement('div');
-    div.className = "video-item";
+    },{threshold:.7})
 
-    if(video.video_status === "uploading") {
-      div.innerHTML = `
-        <p><strong>${video.title}</strong></p>
-        <p>Status: Uploading (${video.progress || 0}%)</p>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width:${video.progress || 0}%"></div>
-        </div>`;
-    } else {
-      div.innerHTML = `
-        <p><strong>${video.title}</strong></p>
-        <p>Status: Published</p>
-        <p>👁 ${video.views} | ❤️ ${video.likes} | 💬 ${video.comments}</p>`;
-    }
-    main.appendChild(div);
-  });
+  videos.forEach(v=>observer.observe(v))
 }
 
-// -----------------
-// Monetize
-// -----------------
-window.showMonetize = function() {
-  const main = document.getElementById("mainContent");
-  main.innerHTML = "<h2>Monetization</h2>";
-  main.innerHTML += `
-    <p>To begin monetizing:</p>
-    <ul>
-      <li>Upload at least 3 videos</li>
-      <li>Get 1,000 views total</li>
-      <li>Follow community guidelines</li>
-    </ul>
-    <button class="monetize-btn" onclick="location.href='monetize.html'">
-      Begin Monetize
-    </button>`;
-}
+/* SIDEBAR PLACEHOLDER FUNCTIONS */
 
-// -----------------
-// Following
-// -----------------
-window.showFollowing = async function() {
-  const main = document.getElementById("mainContent");
-  main.innerHTML = "<h2>Following</h2>";
+window.showDashboard = ()=>{}
+window.showVideos = ()=>{}
+window.showAnalytics = ()=>{}
+window.showMonetization = ()=>{}
+window.showFollowers = ()=>{}
+window.showAchievements = ()=>{}
 
-  const { data, error } = await supabase
-    .from('followers')
-    .select('followed_id, users(username, display_name, avatar_url)')
-    .eq('follower_id', currentUser.id);
-
-  if(error) return main.innerHTML += `<p>Error: ${error.message}</p>`;
-  if(data.length === 0) return main.innerHTML += "<p>You are not following anyone.</p>";
-
-  data.forEach(f => {
-    const div = document.createElement('div');
-    div.className = "video-item";
-    div.innerHTML = `<p><strong>${f.users.display_name}</strong> (@${f.users.username})</p>`;
-    main.appendChild(div);
-  });
-}
-
-// -----------------
-// Followers
-// -----------------
-window.showFollowers = async function() {
-  const main = document.getElementById("mainContent");
-  main.innerHTML = "<h2>Followers</h2>";
-
-  const { data, error } = await supabase
-    .from('followers')
-    .select('follower_id, users(username, display_name, avatar_url)')
-    .eq('followed_id', currentUser.id);
-
-  if(error) return main.innerHTML += `<p>Error: ${error.message}</p>`;
-  if(data.length === 0) return main.innerHTML += "<p>No followers yet.</p>";
-
-  data.forEach(f => {
-    const div = document.createElement('div');
-    div.className = "video-item";
-    div.innerHTML = `<p><strong>${f.users.display_name}</strong> (@${f.users.username})</p>`;
-    main.appendChild(div);
-  });
-}
 </script>
 
 </body>
